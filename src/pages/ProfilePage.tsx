@@ -3,6 +3,19 @@ import type { FormEvent } from "react";
 import { api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import type { Post } from "../types";
+import {
+  Avatar,
+  Button,
+  Card,
+  Empty,
+  Form,
+  Input,
+  List,
+  Space,
+  Typography,
+  message,
+} from "antd";
+import { UserOutlined } from "@ant-design/icons";
 
 type ProfileResponse = {
   user: {
@@ -44,30 +57,78 @@ export const ProfilePage = () => {
     });
 
     await refreshProfile();
+    message.success("Profile updated");
   };
+
+  const profileImageSrc = user?.profileImage
+    ? `http://localhost:3001${user.profileImage}`
+    : undefined;
 
   return (
     <section className="layout">
-      <form className="card form" onSubmit={onSave}>
-        <h1>My Profile</h1>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files?.[0] ?? null)}
-        />
-        <button type="submit">Save profile</button>
-      </form>
+      <Card className="form-card" title="My Profile">
+        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+          <Space>
+            <Avatar
+              size={64}
+              src={profileImageSrc}
+              icon={<UserOutlined />}
+              style={{ backgroundColor: "#1d4ed8" }}
+            />
+            <Space direction="vertical" size={0}>
+              <Typography.Text strong>{user?.username}</Typography.Text>
+              <Typography.Text type="secondary">{user?.email}</Typography.Text>
+            </Space>
+          </Space>
+
+          <Form layout="vertical" onSubmitCapture={onSave}>
+            <Form.Item label="Username" required>
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Form.Item>
+            <Form.Item label="Profile image">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+              />
+            </Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save profile
+            </Button>
+          </Form>
+        </Space>
+      </Card>
 
       <section>
-        <h2>My Posts</h2>
-        <div className="feed-grid">
-          {myPosts.map((post) => (
-            <article key={post._id} className="card post-card">
-              <p>{post.text}</p>
-            </article>
-          ))}
-        </div>
+        <Typography.Title level={4}>My Reviews</Typography.Title>
+        {!myPosts.length ? (
+          <Card>
+            <Empty description="You have not posted anime reviews yet" />
+          </Card>
+        ) : (
+          <Card>
+            <List
+              dataSource={myPosts}
+              renderItem={(post) => (
+                <List.Item key={post._id}>
+                  <Space
+                    direction="vertical"
+                    size={2}
+                    style={{ width: "100%" }}
+                  >
+                    <Typography.Text>{post.text}</Typography.Text>
+                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      {new Date(post.createdAt).toLocaleString()}
+                    </Typography.Text>
+                  </Space>
+                </List.Item>
+              )}
+            />
+          </Card>
+        )}
       </section>
     </section>
   );

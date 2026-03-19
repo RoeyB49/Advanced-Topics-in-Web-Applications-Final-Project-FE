@@ -2,9 +2,25 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import {
+  Alert,
+  Button,
+  Card,
+  Form,
+  Input,
+  Space,
+  Typography,
+  message,
+} from "antd";
+import {
+  FacebookFilled,
+  GoogleCircleFilled,
+  LockOutlined,
+  MailOutlined,
+} from "@ant-design/icons";
 
 export const LoginPage = () => {
-  const { login, socialLogin } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,48 +37,70 @@ export const LoginPage = () => {
     }
   };
 
-  const mockSocial = async (provider: "google" | "facebook") => {
-    try {
-      await socialLogin(provider, {
-        providerId: `${provider}-demo-id`,
-        email: `${provider}.demo@example.com`,
-        username: `${provider}-demo`,
-      });
-      navigate("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message ?? "Social login failed");
-    }
+  const onSocialClick = (provider: "google" | "facebook") => {
+    message.info(
+      `${provider} login is not configured yet. Add OAuth client setup to enable it.`,
+    );
   };
 
   return (
     <section className="center-page">
-      <form className="card form" onSubmit={onSubmit}>
-        <h1>Login</h1>
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {error ? <p className="error">{error}</p> : null}
-        <button type="submit">Login</button>
-        <div className="social-row">
-          <button type="button" onClick={() => mockSocial("google")}>
-            Google
-          </button>
-          <button type="button" onClick={() => mockSocial("facebook")}>
-            Facebook
-          </button>
-        </div>
-      </form>
+      <Card
+        className="form-card"
+        title={<Typography.Title level={3}>Welcome to Animon</Typography.Title>}
+      >
+        <Typography.Paragraph type="secondary">
+          Log in to review anime and see what others recommend.
+        </Typography.Paragraph>
+        <Form layout="vertical" onSubmitCapture={onSubmit}>
+          <Form.Item label="Email" required>
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Form.Item>
+          <Form.Item label="Password" required>
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </Form.Item>
+          {error ? (
+            <Alert
+              type="error"
+              showIcon
+              message={error}
+              style={{ marginBottom: 12 }}
+            />
+          ) : null}
+          <Button type="primary" htmlType="submit" block>
+            Login
+          </Button>
+          <Space style={{ marginTop: 12, width: "100%" }} direction="vertical">
+            <Button
+              icon={<GoogleCircleFilled />}
+              block
+              onClick={() => onSocialClick("google")}
+            >
+              Continue with Google
+            </Button>
+            <Button
+              icon={<FacebookFilled />}
+              block
+              onClick={() => onSocialClick("facebook")}
+            >
+              Continue with Facebook
+            </Button>
+          </Space>
+        </Form>
+      </Card>
     </section>
   );
 };

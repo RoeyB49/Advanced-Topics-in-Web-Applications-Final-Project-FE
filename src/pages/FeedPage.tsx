@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "../services/api";
 import type { Post } from "../types";
 import { PostCard } from "../components/PostCard";
+import { Card, Empty, Input, Space, Spin, Typography } from "antd";
+import { RobotOutlined, SearchOutlined } from "@ant-design/icons";
 
 type FeedResponse = {
   posts: Post[];
@@ -85,14 +87,30 @@ export const FeedPage = () => {
 
   return (
     <section className="layout">
-      <div className="card toolbar">
-        <input
-          placeholder="Ask AI to search posts..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button onClick={onSearch}>Search</button>
-      </div>
+      <Card className="toolbar-card">
+        <Space direction="vertical" size={8} style={{ width: "100%" }}>
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            Explore Animon Reviews
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            Search by title, genre, or mood and let AI surface relevant anime
+            takes.
+          </Typography.Text>
+          <Input.Search
+            enterButton={
+              <>
+                <SearchOutlined /> Search
+              </>
+            }
+            size="large"
+            prefix={<RobotOutlined />}
+            placeholder="Try: psychological thriller, found family, best mecha finales"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onSearch={onSearch}
+          />
+        </Space>
+      </Card>
 
       <div className="feed-grid">
         {posts.map((post) => (
@@ -100,9 +118,13 @@ export const FeedPage = () => {
         ))}
       </div>
 
-      {loading ? <p className="center">Loading...</p> : null}
+      {loading ? (
+        <div className="center">
+          <Spin size="large" />
+        </div>
+      ) : null}
       {!loading && !posts.length ? (
-        <p className="center">No posts found</p>
+        <Empty description="No anime reviews found" />
       ) : null}
     </section>
   );

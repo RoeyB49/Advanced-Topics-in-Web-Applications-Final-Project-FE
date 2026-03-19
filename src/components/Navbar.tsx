@@ -1,5 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Button, Layout, Space, Typography } from "antd";
+import {
+  HomeOutlined,
+  LogoutOutlined,
+  PlusOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -11,17 +18,27 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="navbar">
+    <Layout.Header className="navbar">
       <Link to="/" className="brand">
-        CampusShare
+        <Typography.Title level={4} style={{ color: "#fff", margin: 0 }}>
+          Animon
+        </Typography.Title>
       </Link>
-      <nav className="nav-links">
+      <Space size="middle" className="nav-links">
         {user ? (
           <>
-            <Link to="/">Feed</Link>
-            <Link to="/posts/new">New Post</Link>
-            <Link to="/profile">Profile</Link>
-            <button onClick={onLogout}>Logout</button>
+            <Link to="/">
+              <HomeOutlined /> Feed
+            </Link>
+            <Link to="/posts/new">
+              <PlusOutlined /> Review Anime
+            </Link>
+            <Link to="/profile">
+              <UserOutlined /> Profile
+            </Link>
+            <Button size="small" onClick={onLogout} icon={<LogoutOutlined />}>
+              Logout
+            </Button>
           </>
         ) : (
           <>
@@ -29,7 +46,7 @@ export const Navbar = () => {
             <Link to="/register">Register</Link>
           </>
         )}
-      </nav>
-    </header>
+      </Space>
+    </Layout.Header>
   );
 };
