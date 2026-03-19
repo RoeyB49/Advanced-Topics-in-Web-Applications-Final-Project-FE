@@ -12,7 +12,9 @@ export const Navbar = () => {
 
   return (
     <header className="navbar">
-      <Link to="/" className="brand">CampusShare</Link>
+      <Link to="/" className="brand">
+        CampusShare
+      </Link>
       <nav className="nav-links">
         {user ? (
           <>

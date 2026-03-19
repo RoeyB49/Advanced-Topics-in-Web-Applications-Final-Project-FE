@@ -40,7 +40,7 @@ export const ProfilePage = () => {
     }
 
     await api.put(`/users/${user._id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" }
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     await refreshProfile();
@@ -51,7 +51,11 @@ export const ProfilePage = () => {
       <form className="card form" onSubmit={onSave}>
         <h1>My Profile</h1>
         <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+        />
         <button type="submit">Save profile</button>
       </form>
 

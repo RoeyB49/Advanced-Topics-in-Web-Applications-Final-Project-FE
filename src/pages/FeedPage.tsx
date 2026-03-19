@@ -21,9 +21,13 @@ export const FeedPage = () => {
   const fetchPage = async (targetPage: number) => {
     setLoading(true);
     try {
-      const response = await api.get<FeedResponse>(`/posts?page=${targetPage}&limit=5`);
+      const response = await api.get<FeedResponse>(
+        `/posts?page=${targetPage}&limit=5`,
+      );
       const nextPosts = response.data.posts;
-      setPosts((prev) => (targetPage === 1 ? nextPosts : [...prev, ...nextPosts]));
+      setPosts((prev) =>
+        targetPage === 1 ? nextPosts : [...prev, ...nextPosts],
+      );
       setHasMore(response.data.currentPage < response.data.totalPages);
       setPage(targetPage);
     } finally {
@@ -55,7 +59,9 @@ export const FeedPage = () => {
     }
     setLoading(true);
     try {
-      const response = await api.get<Post[]>(`/posts/search?q=${encodeURIComponent(query)}`);
+      const response = await api.get<Post[]>(
+        `/posts/search?q=${encodeURIComponent(query)}`,
+      );
       setPosts(response.data);
       setHasMore(false);
     } finally {
@@ -70,10 +76,10 @@ export const FeedPage = () => {
           ? {
               ...post,
               likes: updatedPost.likes,
-              likesCount: updatedPost.likes.length
+              likesCount: updatedPost.likes.length,
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
 
@@ -95,7 +101,9 @@ export const FeedPage = () => {
       </div>
 
       {loading ? <p className="center">Loading...</p> : null}
-      {!loading && !posts.length ? <p className="center">No posts found</p> : null}
+      {!loading && !posts.length ? (
+        <p className="center">No posts found</p>
+      ) : null}
     </section>
   );
 };

@@ -27,11 +27,11 @@ export const PostEditorPage = () => {
 
     if (postId) {
       await api.put(`/posts/${postId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
       });
     } else {
       await api.post("/posts", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
       });
     }
 
@@ -42,8 +42,17 @@ export const PostEditorPage = () => {
     <section className="center-page">
       <form className="card form" onSubmit={onSubmit}>
         <h1>{postId ? "Edit Post" : "Create Post"}</h1>
-        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={6} required />
-        <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} />
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={6}
+          required
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+        />
         <button type="submit">{postId ? "Update" : "Publish"}</button>
       </form>
     </section>

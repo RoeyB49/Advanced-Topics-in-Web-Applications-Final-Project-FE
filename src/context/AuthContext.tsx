@@ -5,7 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
-  type ReactNode
+  type ReactNode,
 } from "react";
 import { api } from "../services/api";
 import type { AuthResponse, User } from "../types";
@@ -14,13 +14,20 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
-  socialLogin: (provider: "google" | "facebook", payload: {
-    providerId: string;
-    email: string;
-    username: string;
-    profileImage?: string;
-  }) => Promise<void>;
+  register: (
+    username: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
+  socialLogin: (
+    provider: "google" | "facebook",
+    payload: {
+      providerId: string;
+      email: string;
+      username: string;
+      profileImage?: string;
+    },
+  ) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -66,15 +73,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    const response = await api.post<AuthResponse>("/auth/login", { email, password });
+    const response = await api.post<AuthResponse>("/auth/login", {
+      email,
+      password,
+    });
     applyAuth(response.data);
   };
 
-  const register = async (username: string, email: string, password: string) => {
+  const register = async (
+    username: string,
+    email: string,
+    password: string,
+  ) => {
     const response = await api.post<AuthResponse>("/auth/register", {
       username,
       email,
-      password
+      password,
     });
     applyAuth(response.data);
   };
@@ -86,11 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email: string;
       username: string;
       profileImage?: string;
-    }
+    },
   ) => {
     const response = await api.post<AuthResponse>("/auth/social", {
       provider,
-      ...payload
+      ...payload,
     });
     applyAuth(response.data);
   };
@@ -117,9 +131,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       register,
       socialLogin,
       logout,
-      refreshProfile
+      refreshProfile,
     }),
-    [user, loading, refreshProfile]
+    [user, loading, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

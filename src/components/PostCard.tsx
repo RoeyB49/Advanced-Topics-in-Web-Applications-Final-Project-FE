@@ -28,7 +28,9 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
         />
       ) : null}
       <div className="post-actions">
-        <button onClick={toggleLike}>Like ({post.likesCount ?? post.likes.length})</button>
+        <button onClick={toggleLike}>
+          Like ({post.likesCount ?? post.likes.length})
+        </button>
         <Link to={`/posts/${post._id}/comments`}>
           Comments ({post.commentsCount ?? 0})
         </Link>

@@ -26,7 +26,7 @@ export const LoginPage = () => {
       await socialLogin(provider, {
         providerId: `${provider}-demo-id`,
         email: `${provider}.demo@example.com`,
-        username: `${provider}-demo`
+        username: `${provider}-demo`,
       });
       navigate("/");
     } catch (err: any) {
@@ -55,8 +55,12 @@ export const LoginPage = () => {
         {error ? <p className="error">{error}</p> : null}
         <button type="submit">Login</button>
         <div className="social-row">
-          <button type="button" onClick={() => mockSocial("google")}>Google</button>
-          <button type="button" onClick={() => mockSocial("facebook")}>Facebook</button>
+          <button type="button" onClick={() => mockSocial("google")}>
+            Google
+          </button>
+          <button type="button" onClick={() => mockSocial("facebook")}>
+            Facebook
+          </button>
         </div>
       </form>
     </section>
