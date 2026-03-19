@@ -3,6 +3,18 @@ import type { FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../services/api";
 import type { Comment } from "../types";
+import {
+  Avatar,
+  Button,
+  Card,
+  Empty,
+  Form,
+  Input,
+  List,
+  Space,
+  Typography,
+} from "antd";
+import { MessageOutlined, UserOutlined } from "@ant-design/icons";
 
 export const PostCommentsPage = () => {
   const { postId } = useParams();
@@ -30,25 +42,54 @@ export const PostCommentsPage = () => {
 
   return (
     <section className="layout">
-      <form className="card form" onSubmit={onCreate}>
-        <h1>Comments</h1>
-        <input
-          placeholder="Write your comment..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          required
-        />
-        <button type="submit">Add comment</button>
-      </form>
+      <Card className="form-card" title="Discussion">
+        <Typography.Paragraph type="secondary">
+          Drop your thoughts on this anime review.
+        </Typography.Paragraph>
+        <Form layout="vertical" onSubmitCapture={onCreate}>
+          <Form.Item label="Comment" required>
+            <Input
+              placeholder="Write your comment..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              required
+            />
+          </Form.Item>
+          <Button type="primary" htmlType="submit" icon={<MessageOutlined />}>
+            Add comment
+          </Button>
+        </Form>
+      </Card>
 
-      <div className="feed-grid">
-        {comments.map((comment) => (
-          <article key={comment._id} className="card post-card">
-            <strong>{comment.author.username}</strong>
-            <p>{comment.text}</p>
-          </article>
-        ))}
-      </div>
+      <Card>
+        {!comments.length ? (
+          <Empty description="No comments yet" />
+        ) : (
+          <List
+            dataSource={comments}
+            renderItem={(comment) => (
+              <List.Item key={comment._id}>
+                <Space align="start">
+                  <Avatar
+                    src={
+                      comment.author.profileImage
+                        ? `http://localhost:3001${comment.author.profileImage}`
+                        : undefined
+                    }
+                    icon={<UserOutlined />}
+                  />
+                  <Space direction="vertical" size={0}>
+                    <Typography.Text strong>
+                      {comment.author.username}
+                    </Typography.Text>
+                    <Typography.Text>{comment.text}</Typography.Text>
+                  </Space>
+                </Space>
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
     </section>
   );
 };

@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
 import { api } from "../services/api";
 import type { Post } from "../types";
+import { Button, Card, Space, Tag, Typography } from "antd";
+import {
+  EditOutlined,
+  HeartOutlined,
+  MessageOutlined,
+} from "@ant-design/icons";
 
 type Props = {
   post: Post;
@@ -14,12 +20,23 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
   };
 
   return (
-    <article className="card post-card">
-      <div className="post-header">
-        <strong>{post.author.username}</strong>
-        <span>{new Date(post.createdAt).toLocaleString()}</span>
-      </div>
-      <p>{post.text}</p>
+    <Card
+      className="post-card"
+      title={
+        <Space direction="vertical" size={0}>
+          <Typography.Text strong>{post.author.username}</Typography.Text>
+          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+            {new Date(post.createdAt).toLocaleString()}
+          </Typography.Text>
+        </Space>
+      }
+      extra={<Tag color="blue">Anime Review</Tag>}
+    >
+      <Typography.Paragraph
+        style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}
+      >
+        {post.text}
+      </Typography.Paragraph>
       {post.imageUrl ? (
         <img
           src={`http://localhost:3001${post.imageUrl}`}
@@ -27,15 +44,19 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
           className="post-image"
         />
       ) : null}
-      <div className="post-actions">
-        <button onClick={toggleLike}>
+      <Space style={{ marginTop: 12, display: "flex", flexWrap: "wrap" }}>
+        <Button icon={<HeartOutlined />} onClick={toggleLike}>
           Like ({post.likesCount ?? post.likes.length})
-        </button>
+        </Button>
         <Link to={`/posts/${post._id}/comments`}>
-          Comments ({post.commentsCount ?? 0})
+          <Button icon={<MessageOutlined />}>
+            Comments ({post.commentsCount ?? 0})
+          </Button>
         </Link>
-        <Link to={`/posts/${post._id}/edit`}>Edit</Link>
-      </div>
-    </article>
+        <Link to={`/posts/${post._id}/edit`}>
+          <Button icon={<EditOutlined />}>Edit</Button>
+        </Link>
+      </Space>
+    </Card>
   );
 };

@@ -3,6 +3,8 @@ import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../services/api";
 import type { Post } from "../types";
+import { Button, Card, Form, Input, Space, Typography } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 
 export const PostEditorPage = () => {
   const { postId } = useParams();
@@ -40,21 +42,39 @@ export const PostEditorPage = () => {
 
   return (
     <section className="center-page">
-      <form className="card form" onSubmit={onSubmit}>
-        <h1>{postId ? "Edit Post" : "Create Post"}</h1>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={6}
-          required
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files?.[0] ?? null)}
-        />
-        <button type="submit">{postId ? "Update" : "Publish"}</button>
-      </form>
+      <Card
+        className="form-card"
+        title={postId ? "Edit Anime Review" : "Create Anime Review"}
+      >
+        <Typography.Paragraph type="secondary">
+          Share your honest take, pacing notes, standout arcs, and who should
+          watch.
+        </Typography.Paragraph>
+        <Form layout="vertical" onSubmitCapture={onSubmit}>
+          <Form.Item label="Review" required>
+            <Input.TextArea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={6}
+              required
+            />
+          </Form.Item>
+          <Form.Item label="Image">
+            <Input
+              type="file"
+              accept="image/*"
+              prefix={<UploadOutlined />}
+              onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+            />
+          </Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit">
+              {postId ? "Update" : "Publish"}
+            </Button>
+            <Button onClick={() => navigate(-1)}>Cancel</Button>
+          </Space>
+        </Form>
+      </Card>
     </section>
   );
 };
