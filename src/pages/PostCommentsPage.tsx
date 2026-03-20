@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useParams } from "react-router-dom";
-import { API_ORIGIN, api } from "../services/api";
+import { api } from "../services/api";
 import type { Comment } from "../types";
 import {
   Avatar,

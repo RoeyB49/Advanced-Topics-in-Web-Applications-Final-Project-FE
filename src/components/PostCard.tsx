@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { API_ORIGIN, api } from "../services/api";
+import { api } from "../services/api";
 import type { Post } from "../types";
 import { Button, Card, Space, Tag, Typography } from "antd";
 import {
@@ -19,7 +19,7 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
   const imageSrc = post.imageUrl
     ? post.imageUrl.startsWith("http")
       ? post.imageUrl
-      : `${API_ORIGIN}${post.imageUrl}`
+      : `${api}${post.imageUrl}`
     : undefined;
 
   const toggleLike = async () => {

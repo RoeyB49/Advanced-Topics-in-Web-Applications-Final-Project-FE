@@ -96,3 +96,7 @@ api.interceptors.response.use(
     throw error;
   }
 );
+function redirectToLogin() {
+  window.location.href = "/login";
+}
+

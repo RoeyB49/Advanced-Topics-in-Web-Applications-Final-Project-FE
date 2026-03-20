@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { API_ORIGIN, api } from "../services/api";
+import { api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import type { Post } from "../types";
 import {
