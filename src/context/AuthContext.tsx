@@ -22,10 +22,7 @@ type AuthContextType = {
   socialLogin: (
     provider: "google" | "facebook",
     payload: {
-      providerId: string;
-      email: string;
-      username: string;
-      profileImage?: string;
+      token: string;
     },
   ) => Promise<void>;
   logout: () => Promise<void>;
@@ -96,10 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const socialLogin = async (
     provider: "google" | "facebook",
     payload: {
-      providerId: string;
-      email: string;
-      username: string;
-      profileImage?: string;
+      token: string;
     },
   ) => {
     const response = await api.post<AuthResponse>("/auth/social", {
