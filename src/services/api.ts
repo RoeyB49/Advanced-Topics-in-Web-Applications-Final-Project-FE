@@ -1,7 +1,18 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001/api";
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
+export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
+
+const redirectToLogin = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (window.location.pathname !== "/login") {
+    window.location.assign("/login");
+  }
+};
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -19,11 +30,19 @@ api.interceptors.request.use((config) => {
 });
 
 let isRefreshing = false;
-let queuedResolvers: Array<(token: string) => void> = [];
+let queuedRequests: Array<{
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+}> = [];
 
-const flushQueue = (token: string) => {
-  queuedResolvers.forEach((resolve) => resolve(token));
-  queuedResolvers = [];
+const flushQueueSuccess = (token: string) => {
+  queuedRequests.forEach(({ resolve }) => resolve(token));
+  queuedRequests = [];
+};
+
+const flushQueueError = (refreshError: unknown) => {
+  queuedRequests.forEach(({ reject }) => reject(refreshError));
+  queuedRequests = [];
 };
 
 api.interceptors.response.use(
@@ -39,10 +58,13 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          queuedResolvers.push((newToken: string) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            resolve(api(originalRequest));
+        return new Promise((resolve, reject) => {
+          queuedRequests.push({
+            resolve: (newToken: string) => {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              resolve(api(originalRequest));
+            },
+            reject
           });
         });
       }
@@ -50,6 +72,8 @@ api.interceptors.response.use(
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        redirectToLogin();
         throw error;
       }
 
@@ -65,10 +89,16 @@ api.interceptors.response.use(
         localStorage.setItem("accessToken", newAccessToken);
         localStorage.setItem("refreshToken", newRefreshToken);
 
-        flushQueue(newAccessToken);
+        flushQueueSuccess(newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        flushQueueError(refreshError);
+        redirectToLogin();
+        throw refreshError;
       } finally {
         isRefreshing = false;
       }

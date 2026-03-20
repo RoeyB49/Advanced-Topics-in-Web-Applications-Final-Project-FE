@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { api } from "../services/api";
+import { API_ORIGIN, api } from "../services/api";
 import type { Post } from "../types";
 import { Button, Card, Space, Tag, Typography } from "antd";
 import {
@@ -14,6 +14,14 @@ type Props = {
 };
 
 export const PostCard = ({ post, onLikeChanged }: Props) => {
+  const authorName = post.author?.username ?? "Unknown user";
+  const likesCount = post.likesCount ?? post.likes?.length ?? 0;
+  const imageSrc = post.imageUrl
+    ? post.imageUrl.startsWith("http")
+      ? post.imageUrl
+      : `${API_ORIGIN}${post.imageUrl}`
+    : undefined;
+
   const toggleLike = async () => {
     const response = await api.post<Post>(`/posts/${post._id}/like`);
     onLikeChanged(response.data);
@@ -23,8 +31,8 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
     <Card
       className="post-card"
       title={
-        <Space direction="vertical" size={0}>
-          <Typography.Text strong>{post.author.username}</Typography.Text>
+        <Space orientation="vertical" size={0}>
+          <Typography.Text strong>{authorName}</Typography.Text>
           <Typography.Text type="secondary" style={{ fontSize: 12 }}>
             {new Date(post.createdAt).toLocaleString()}
           </Typography.Text>
@@ -37,16 +45,12 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
       >
         {post.text}
       </Typography.Paragraph>
-      {post.imageUrl ? (
-        <img
-          src={`http://localhost:3001${post.imageUrl}`}
-          alt="post"
-          className="post-image"
-        />
+      {imageSrc ? (
+        <img src={imageSrc} alt="post" className="post-image" />
       ) : null}
       <Space style={{ marginTop: 12, display: "flex", flexWrap: "wrap" }}>
         <Button icon={<HeartOutlined />} onClick={toggleLike}>
-          Like ({post.likesCount ?? post.likes.length})
+          Like ({likesCount})
         </Button>
         <Link to={`/posts/${post._id}/comments`}>
           <Button icon={<MessageOutlined />}>
