@@ -61,7 +61,7 @@ export const ProfilePage = () => {
   };
 
   const profileImageSrc = user?.profileImage
-    ? `http://localhost:3001${user.profileImage}`
+    ? `http://localhost:3000${user.profileImage}`
     : undefined;
 
   return (

@@ -73,7 +73,7 @@ export const PostCommentsPage = () => {
                   <Avatar
                     src={
                       comment.author.profileImage
-                        ? `http://localhost:3001${comment.author.profileImage}`
+                        ? `http://localhost:3000${comment.author.profileImage}`
                         : undefined
                     }
                     icon={<UserOutlined />}

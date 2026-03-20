@@ -39,7 +39,7 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
       </Typography.Paragraph>
       {post.imageUrl ? (
         <img
-          src={`http://localhost:3001${post.imageUrl}`}
+          src={`http://localhost:3000${post.imageUrl}`}
           alt="post"
           className="post-image"
         />
