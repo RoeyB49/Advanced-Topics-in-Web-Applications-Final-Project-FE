@@ -20,9 +20,16 @@ export const Navbar = () => {
   return (
     <Layout.Header className="navbar">
       <Link to="/" className="brand">
-        <Typography.Title level={4} style={{ color: "#fff", margin: 0 }}>
-          Animon
-        </Typography.Title>
+        <Space size={10} align="center">
+          <img
+            src="/branding/app-logo.svg"
+            alt="Animon logo"
+            className="brand-logo"
+          />
+          <Typography.Title level={4} style={{ color: "#fff", margin: 0 }}>
+            Animon
+          </Typography.Title>
+        </Space>
       </Link>
       <Space size="middle" className="nav-links">
         {user ? (
@@ -36,7 +43,12 @@ export const Navbar = () => {
             <Link to="/profile">
               <UserOutlined /> Profile
             </Link>
-            <Button size="small" onClick={onLogout} icon={<LogoutOutlined />}>
+            <Button
+              size="small"
+              onClick={onLogout}
+              icon={<LogoutOutlined />}
+              className="logout-btn"
+            >
               Logout
             </Button>
           </>

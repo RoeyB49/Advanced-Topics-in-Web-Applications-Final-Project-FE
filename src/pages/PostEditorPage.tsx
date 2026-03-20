@@ -3,24 +3,48 @@ import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../services/api";
 import type { Post } from "../types";
-import { Button, Card, Form, Input, Space, Typography } from "antd";
+import { Button, Card, Form, Input, Space, Typography, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { useAuth } from "../context/AuthContext";
 
 export const PostEditorPage = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [loadingPost, setLoadingPost] = useState(Boolean(postId));
+  const [canEdit, setCanEdit] = useState(!postId);
 
   useEffect(() => {
     if (!postId) return;
-    api.get<Post>(`/posts/${postId}`).then((response) => {
-      setText(response.data.text);
-    });
-  }, [postId]);
+    setLoadingPost(true);
+
+    api
+      .get<Post>(`/posts/${postId}`)
+      .then((response) => {
+        const isOwner = response.data.author?._id === user?._id;
+        if (!isOwner) {
+          setCanEdit(false);
+          message.error("You can only edit your own posts.");
+          navigate("/");
+          return;
+        }
+
+        setCanEdit(true);
+        setText(response.data.text);
+      })
+      .catch(() => {
+        message.error("Unable to load this post.");
+        navigate("/");
+      })
+      .finally(() => setLoadingPost(false));
+  }, [postId, user?._id, navigate]);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (postId && !canEdit) return;
+
     const formData = new FormData();
     formData.append("text", text);
     if (image) {
@@ -45,6 +69,7 @@ export const PostEditorPage = () => {
       <Card
         className="form-card"
         title={postId ? "Edit Anime Review" : "Create Anime Review"}
+        loading={loadingPost}
       >
         <Typography.Paragraph type="secondary">
           Share your honest take, pacing notes, standout arcs, and who should
@@ -68,7 +93,11 @@ export const PostEditorPage = () => {
             />
           </Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit">
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={postId ? !canEdit : false}
+            >
               {postId ? "Update" : "Publish"}
             </Button>
             <Button onClick={() => navigate(-1)}>Cancel</Button>

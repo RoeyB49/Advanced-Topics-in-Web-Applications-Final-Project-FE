@@ -12,8 +12,13 @@ createRoot(document.getElementById("root")!).render(
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#1d4ed8",
-          borderRadius: 10,
+          colorPrimary: "#7c3aed",
+          colorInfo: "#8b5cf6",
+          colorSuccess: "#22c55e",
+          colorWarning: "#f59e0b",
+          colorError: "#ef4444",
+          borderRadius: 12,
+          fontFamily: '"Space Grotesk", "Segoe UI", sans-serif',
         },
       }}
     >
