@@ -61,9 +61,7 @@ export const ProfilePage = () => {
   };
 
   const profileImageSrc = user?.profileImage
-    ? user.profileImage.startsWith("http")
-      ? user.profileImage
-      : `${API_ORIGIN}${user.profileImage}`
+    ? `http://localhost:3000${user.profileImage}`
     : undefined;
 
   return (

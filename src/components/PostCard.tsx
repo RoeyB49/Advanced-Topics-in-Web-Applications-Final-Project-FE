@@ -45,8 +45,12 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
       >
         {post.text}
       </Typography.Paragraph>
-      {imageSrc ? (
-        <img src={imageSrc} alt="post" className="post-image" />
+      {post.imageUrl ? (
+        <img
+          src={`http://localhost:3000${post.imageUrl}`}
+          alt="post"
+          className="post-image"
+        />
       ) : null}
       <Space style={{ marginTop: 12, display: "flex", flexWrap: "wrap" }}>
         <Button icon={<HeartOutlined />} onClick={toggleLike}>

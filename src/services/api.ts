@@ -2,17 +2,6 @@ import axios from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
-export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
-
-const redirectToLogin = () => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  if (window.location.pathname !== "/login") {
-    window.location.assign("/login");
-  }
-};
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

@@ -72,10 +72,8 @@ export const PostCommentsPage = () => {
                 <Space align="start">
                   <Avatar
                     src={
-                      comment.author?.profileImage
-                        ? comment.author.profileImage.startsWith("http")
-                          ? comment.author.profileImage
-                          : `${API_ORIGIN}${comment.author.profileImage}`
+                      comment.author.profileImage
+                        ? `http://localhost:3000${comment.author.profileImage}`
                         : undefined
                     }
                     icon={<UserOutlined />}
