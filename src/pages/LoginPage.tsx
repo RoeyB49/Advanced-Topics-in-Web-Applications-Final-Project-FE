@@ -83,7 +83,10 @@ export const LoginPage = () => {
           <Button type="primary" htmlType="submit" block>
             Login
           </Button>
-          <Space style={{ marginTop: 12, width: "100%" }} direction="vertical">
+          <Space
+            style={{ marginTop: 12, width: "100%" }}
+            orientation="vertical"
+          >
             <Button
               icon={<GoogleCircleFilled />}
               block

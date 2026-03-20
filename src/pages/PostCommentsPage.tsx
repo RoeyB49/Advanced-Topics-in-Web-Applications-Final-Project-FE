@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../services/api";
+import { API_ORIGIN, api } from "../services/api";
 import type { Comment } from "../types";
 import {
   Avatar,
@@ -78,9 +78,9 @@ export const PostCommentsPage = () => {
                     }
                     icon={<UserOutlined />}
                   />
-                  <Space direction="vertical" size={0}>
+                  <Space orientation="vertical" size={0}>
                     <Typography.Text strong>
-                      {comment.author.username}
+                      {comment.author?.username ?? "Unknown user"}
                     </Typography.Text>
                     <Typography.Text>{comment.text}</Typography.Text>
                   </Space>

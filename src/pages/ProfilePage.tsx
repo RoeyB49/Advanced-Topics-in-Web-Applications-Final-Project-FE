@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { api } from "../services/api";
+import { API_ORIGIN, api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import type { Post } from "../types";
 import {
@@ -67,7 +67,7 @@ export const ProfilePage = () => {
   return (
     <section className="layout">
       <Card className="form-card" title="My Profile">
-        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+        <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
           <Space>
             <Avatar
               size={64}
@@ -75,7 +75,7 @@ export const ProfilePage = () => {
               icon={<UserOutlined />}
               style={{ backgroundColor: "#1d4ed8" }}
             />
-            <Space direction="vertical" size={0}>
+            <Space orientation="vertical" size={0}>
               <Typography.Text strong>{user?.username}</Typography.Text>
               <Typography.Text type="secondary">{user?.email}</Typography.Text>
             </Space>
@@ -115,7 +115,7 @@ export const ProfilePage = () => {
               renderItem={(post) => (
                 <List.Item key={post._id}>
                   <Space
-                    direction="vertical"
+                    orientation="vertical"
                     size={2}
                     style={{ width: "100%" }}
                   >
