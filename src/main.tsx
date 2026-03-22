@@ -2,10 +2,11 @@ import { StrictMode } from "react";
 import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, theme } from "antd";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider, useThemeMode } from "./context/ThemeContext";
 import "antd/dist/reset.css";
 import "./index.css";
 
@@ -23,10 +24,14 @@ const AppProviders = ({ children }: { children: ReactNode }) => {
   );
 };
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+const ThemedConfigProvider = ({ children }: { children: ReactNode }) => {
+  const { mode } = useThemeMode();
+
+  return (
     <ConfigProvider
       theme={{
+        algorithm:
+          mode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
           colorPrimary: "#7c3aed",
           colorInfo: "#8b5cf6",
@@ -38,13 +43,23 @@ createRoot(document.getElementById("root")!).render(
         },
       }}
     >
-      <AppProviders>
-        <BrowserRouter>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-        </BrowserRouter>
-      </AppProviders>
+      {children}
     </ConfigProvider>
+  );
+};
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <ThemeProvider>
+      <ThemedConfigProvider>
+        <AppProviders>
+          <BrowserRouter>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </BrowserRouter>
+        </AppProviders>
+      </ThemedConfigProvider>
+    </ThemeProvider>
   </StrictMode>,
 );
