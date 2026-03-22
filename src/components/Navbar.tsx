@@ -4,12 +4,16 @@ import { Button, Layout, Space, Typography } from "antd";
 import {
   HomeOutlined,
   LogoutOutlined,
+  MoonOutlined,
   PlusOutlined,
+  SunOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { useThemeMode } from "../context/ThemeContext";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
+  const { mode, toggleTheme } = useThemeMode();
   const navigate = useNavigate();
 
   const onLogout = async () => {
@@ -32,6 +36,14 @@ export const Navbar = () => {
         </Space>
       </Link>
       <Space size="middle" className="nav-links">
+        <Button
+          size="small"
+          onClick={toggleTheme}
+          icon={mode === "light" ? <MoonOutlined /> : <SunOutlined />}
+          className="theme-toggle-btn"
+        >
+          {mode === "light" ? "Dark" : "Light"}
+        </Button>
         {user ? (
           <>
             <Link to="/">
