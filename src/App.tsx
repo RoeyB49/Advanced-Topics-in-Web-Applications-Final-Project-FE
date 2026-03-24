@@ -3,6 +3,7 @@ import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { FeedPage } from "./pages/FeedPage";
 import { LoginPage } from "./pages/LoginPage";
+import { AnimeAdvisorPage } from "./pages/AnimeAdvisorPage";
 import { PostCommentsPage } from "./pages/PostCommentsPage";
 import { PostEditorPage } from "./pages/PostEditorPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -29,6 +30,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/advisor"
+            element={
+              <ProtectedRoute>
+                <AnimeAdvisorPage />
               </ProtectedRoute>
             }
           />

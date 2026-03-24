@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Button, Layout, Space, Typography } from "antd";
 import {
+  CommentOutlined,
   HomeOutlined,
   LogoutOutlined,
   PlusOutlined,
@@ -42,6 +43,9 @@ export const Navbar = () => {
             </Link>
             <Link to="/profile">
               <UserOutlined /> Profile
+            </Link>
+            <Link to="/advisor">
+              <CommentOutlined /> AI Advisor
             </Link>
             <Button
               size="small"
