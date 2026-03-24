@@ -1,82 +1,75 @@
-# React + TypeScript + Vite
+# Animon Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for our anime social/review platform built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## What We Built
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Authentication flow (register, login, logout)
+  
+<img width="673" height="532" alt="image" src="https://github.com/user-attachments/assets/4a2c9f89-c3c7-4491-8933-f92b4fd0fe1c" />
 
-## React Compiler
+- Social login support (Google and Facebook)
+  
+<img width="673" height="532" alt="image" src="https://github.com/user-attachments/assets/63476283-92f6-469e-9981-f26ef74aade8" />
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Protected routes for authenticated pages
+  
+- Feed with infinite scroll for anime reviews
+  
+<img width="1145" height="626" alt="image" src="https://github.com/user-attachments/assets/5e0db39a-aeb3-4950-813d-4de70505106f" />
 
-## Expanding the ESLint configuration
+- Intelligent search with AI query analysis
+  
+<img width="976" height="177" alt="image" src="https://github.com/user-attachments/assets/6079a298-fe9a-40f5-9d48-f628e7f5029a" />
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Create and edit review posts (with image upload)
+  
+<img width="569" height="505" alt="image" src="https://github.com/user-attachments/assets/a0862b37-53d7-4213-8681-fd574633966d" />
 
-```js
-export default defineConfig([
-  # Advanced Topics in Web Applications – Final Project (FE)
+- Post comments and discussions
+  
+<img width="1014" height="637" alt="image" src="https://github.com/user-attachments/assets/2fb6328e-89fe-400b-9f6e-08646f691972" />
 
-  Frontend client for the Animon application.
 
-  ## Local development
+- Personal profile page with profile editing and user posts
+  
+<img width="976" height="595" alt="image" src="https://github.com/user-attachments/assets/79aa2539-0265-4ba4-92d7-f70405111ce4" />
 
-  ```bash
-  npm install
-  npm run dev
-  ```
+- AI Anime Advisor chat for personalized recommendations
+  
+<img width="976" height="691" alt="image" src="https://github.com/user-attachments/assets/09a9b4ff-44bc-42f2-bf7c-931af3d0aba0" />
 
-  ## Production build
+## Tech Stack
 
-  ```bash
-  npm run build
-  ```
+- React 19 + TypeScript
+- Vite
+- Ant Design
+- React Router
+- Axios
 
-  ## Deployment (Colman Ubuntu Server)
+## Quick Start
 
-  This frontend is intended to be served by nginx as static files.
+```bash
+npm install
+npm run dev
+```
 
-  ### 1. Server folder setup
+Build for production:
 
-  ```bash
-  mkdir -p ~/apps
-  mkdir -p /var/www/animon-fe
-  ```
+```bash
+npm run build
+```
 
-  ### 2. Clone frontend and configure env
+## Environment Variables (Optional)
 
-  ```bash
-  cd ~/apps
-  git clone <YOUR_FE_REPO_URL> animon-fe
-  cd animon-fe
-  cp deploy/.env.production.example .env.production
-  nano .env.production
-  ```
+Create a `.env` file if needed:
 
-  Default env value:
+```env
+VITE_API_BASE_URL=http://localhost:3000/api
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_FACEBOOK_APP_ID=your_facebook_app_id
+```
 
-  - `VITE_API_BASE_URL=http://node01.cs.colman.ac.il/api`
+## Notes
 
-  ### 3. Deploy static build
-
-  ```bash
-  chmod +x deploy/deploy_fe.sh
-  ./deploy/deploy_fe.sh
-  ```
-
-  This script builds the project and syncs static assets into:
-
-  - `/var/www/animon-fe/dist`
-
-  ### 4. Nginx
-
-  Nginx site is configured from the backend repository (`deploy/nginx_animon.conf`) and should point root to:
-
-  - `/var/www/animon-fe/dist`
-
-  ### Deployment files in this repo
-
-  - `deploy/deploy_fe.sh`
-  - `deploy/.env.production.example`
+- This repo is the FE only and expects a compatible backend API.
