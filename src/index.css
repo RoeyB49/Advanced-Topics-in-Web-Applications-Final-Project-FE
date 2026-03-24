@@ -177,6 +177,71 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.advisor-hero-card,
+.advisor-input-card,
+.advisor-chat-card,
+.advisor-results-card,
+.advisor-reco-item {
+  border-radius: 18px;
+  border: 1px solid rgba(233, 213, 255, 0.75);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+}
+
+.advisor-hero-card {
+  background:
+    radial-gradient(circle at 80% 12%, rgba(216, 180, 254, 0.46), transparent 34%),
+    radial-gradient(circle at 16% 90%, rgba(192, 132, 252, 0.3), transparent 35%),
+    rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 34px rgba(91, 33, 182, 0.17);
+}
+
+.advisor-input-card,
+.advisor-chat-card,
+.advisor-results-card {
+  box-shadow: 0 14px 28px rgba(76, 29, 149, 0.14);
+}
+
+.advisor-chat-log {
+  display: grid;
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.advisor-bubble {
+  max-width: 92%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  line-height: 1.4;
+}
+
+.advisor-bubble-user {
+  justify-self: end;
+  background: linear-gradient(120deg, #7e22ce, #9333ea);
+  color: #fff;
+}
+
+.advisor-bubble-user .ant-typography {
+  color: #fff;
+}
+
+.advisor-bubble-assistant {
+  justify-self: start;
+  background: rgba(233, 213, 255, 0.62);
+  border: 1px solid rgba(192, 132, 252, 0.45);
+}
+
+.advisor-reco-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.advisor-reco-item {
+  box-shadow: 0 10px 24px rgba(76, 29, 149, 0.12);
+}
+
 .post-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 34px var(--card-shadow);
@@ -226,5 +291,9 @@ body {
 
   .nav-links a {
     padding: 6px 10px;
+  }
+
+  .advisor-bubble {
+    max-width: 100%;
   }
 }

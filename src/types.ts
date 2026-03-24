@@ -36,6 +36,29 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+export interface ChatHistoryItem {
+  role: "user" | "assistant";
+  text: string;
+}
+
+export interface AnimeRecommendation {
+  title: string;
+  reason: string;
+  genres: string[];
+  mood: string;
+  confidence: number;
+}
+
+export interface RecommendationChatResponse {
+  source: "gemini" | "fallback";
+  reply: string;
+  recommendations: AnimeRecommendation[];
+  extractedPreferences: string[];
+  basedOn: {
+    watchedCount: number;
+    preferenceCount: number;
+    userSignalCount: number;
+  };
 export interface IntelligentSearchAI {
   source: "gemini" | "fallback";
   intent: "recommendation" | "comparison" | "analysis" | "general-search";
