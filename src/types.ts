@@ -59,4 +59,17 @@ export interface RecommendationChatResponse {
     preferenceCount: number;
     userSignalCount: number;
   };
+export interface IntelligentSearchAI {
+  source: "gemini" | "fallback";
+  intent: "recommendation" | "comparison" | "analysis" | "general-search";
+  sentimentHint: "positive" | "negative" | "mixed" | "neutral";
+  detectedAnimeTitles: string[];
+  detectedGenres: string[];
+  keywords: string[];
+}
+
+export interface IntelligentSearchResponse {
+  query: string;
+  ai: IntelligentSearchAI;
+  posts: Post[];
 }

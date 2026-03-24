@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../services/api";
-import type { Post } from "../types";
+import type { IntelligentSearchAI, IntelligentSearchResponse, Post } from "../types";
 import { PostCard } from "../components/PostCard";
-import { Card, Empty, Input, Space, Spin, Typography } from "antd";
+import { Card, Empty, Input, Space, Spin, Tag, Typography } from "antd";
 import { RobotOutlined, SearchOutlined } from "@ant-design/icons";
 
 type FeedResponse = {
@@ -17,6 +17,7 @@ export const FeedPage = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [searchAI, setSearchAI] = useState<IntelligentSearchAI | null>(null);
 
   const canLoadMore = useMemo(() => hasMore && !loading, [hasMore, loading]);
 
@@ -56,15 +57,17 @@ export const FeedPage = () => {
 
   const onSearch = async () => {
     if (!query.trim()) {
+      setSearchAI(null);
       fetchPage(1);
       return;
     }
     setLoading(true);
     try {
-      const response = await api.get<Post[]>(
-        `/posts/search?q=${encodeURIComponent(query)}`,
+      const response = await api.get<IntelligentSearchResponse>(
+        `/posts/search/intelligent?q=${encodeURIComponent(query)}`,
       );
-      setPosts(response.data);
+      setPosts(response.data.posts);
+      setSearchAI(response.data.ai);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -111,6 +114,55 @@ export const FeedPage = () => {
           />
         </Space>
       </Card>
+
+      {searchAI ? (
+        <Card className="toolbar-card" style={{ marginTop: 12 }}>
+          <Space direction="vertical" size={8} style={{ width: "100%" }}>
+            <Typography.Title level={5} style={{ margin: 0 }}>
+              AI Query Analysis
+            </Typography.Title>
+            <Space wrap>
+              <Tag color="blue">source: {searchAI.source}</Tag>
+              <Tag color="geekblue">intent: {searchAI.intent}</Tag>
+              <Tag color="purple">sentiment: {searchAI.sentimentHint}</Tag>
+            </Space>
+            {searchAI.detectedAnimeTitles.length ? (
+              <div>
+                <Typography.Text strong>Detected titles: </Typography.Text>
+                <Space wrap>
+                  {searchAI.detectedAnimeTitles.map((title) => (
+                    <Tag key={title} color="gold">
+                      {title}
+                    </Tag>
+                  ))}
+                </Space>
+              </div>
+            ) : null}
+            {searchAI.detectedGenres.length ? (
+              <div>
+                <Typography.Text strong>Detected genres: </Typography.Text>
+                <Space wrap>
+                  {searchAI.detectedGenres.map((genre) => (
+                    <Tag key={genre} color="green">
+                      {genre}
+                    </Tag>
+                  ))}
+                </Space>
+              </div>
+            ) : null}
+            {searchAI.keywords.length ? (
+              <div>
+                <Typography.Text strong>Search keywords: </Typography.Text>
+                <Space wrap>
+                  {searchAI.keywords.map((keyword) => (
+                    <Tag key={keyword}>{keyword}</Tag>
+                  ))}
+                </Space>
+              </div>
+            ) : null}
+          </Space>
+        </Card>
+      ) : null}
 
       <div className="feed-grid">
         {posts.map((post) => (

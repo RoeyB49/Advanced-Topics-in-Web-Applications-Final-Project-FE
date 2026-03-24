@@ -1,24 +1,47 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap");
 
 :root {
-  --purple-50: #faf5ff;
-  --purple-100: #f3e8ff;
-  --purple-200: #e9d5ff;
-  --purple-300: #d8b4fe;
-  --purple-400: #c084fc;
-  --purple-500: #a855f7;
-  --purple-600: #9333ea;
-  --purple-700: #7e22ce;
-  --purple-800: #6b21a8;
-  --ink-900: #201334;
-  --ink-700: #4a2a69;
+  --text-color: #1f2230;
+  --bg-base: #f8f4ff;
+  --bg-accent-1: rgba(216, 180, 254, 0.34);
+  --bg-accent-2: rgba(147, 51, 234, 0.26);
+  --bg-accent-3: rgba(192, 132, 252, 0.3);
+  --bg-surface-gradient: linear-gradient(160deg, #fcfbff 0%, #f5ecff 45%, #f8f2ff 100%);
+  --navbar-start: rgba(91, 33, 182, 0.94);
+  --navbar-middle: rgba(126, 34, 206, 0.94);
+  --navbar-end: rgba(168, 85, 247, 0.9);
+  --navbar-shadow: rgba(91, 33, 182, 0.22);
+  --navbar-border: rgba(255, 255, 255, 0.3);
+  --nav-link-color: rgba(255, 255, 255, 0.95);
+  --nav-link-hover-bg: rgba(255, 255, 255, 0.14);
   --glass: rgba(255, 255, 255, 0.76);
+  --card-border: rgba(233, 213, 255, 0.75);
+  --card-shadow: rgba(76, 29, 149, 0.12);
 
-  color: var(--ink-900);
-  background: var(--purple-50);
+  color: var(--text-color);
+  background: var(--bg-base);
   font-family: "Space Grotesk", "Segoe UI", sans-serif;
   line-height: 1.4;
   font-weight: 400;
+}
+
+[data-theme="dark"] {
+  --text-color: #ede7ff;
+  --bg-base: #120d1d;
+  --bg-accent-1: rgba(91, 33, 182, 0.22);
+  --bg-accent-2: rgba(126, 34, 206, 0.24);
+  --bg-accent-3: rgba(59, 130, 246, 0.16);
+  --bg-surface-gradient: linear-gradient(165deg, #161025 0%, #1b1330 50%, #1b1537 100%);
+  --navbar-start: rgba(40, 24, 69, 0.96);
+  --navbar-middle: rgba(53, 31, 90, 0.96);
+  --navbar-end: rgba(66, 39, 110, 0.94);
+  --navbar-shadow: rgba(5, 8, 20, 0.48);
+  --navbar-border: rgba(255, 255, 255, 0.08);
+  --nav-link-color: rgba(244, 241, 255, 0.96);
+  --nav-link-hover-bg: rgba(255, 255, 255, 0.12);
+  --glass: rgba(22, 16, 37, 0.84);
+  --card-border: rgba(168, 85, 247, 0.22);
+  --card-shadow: rgba(5, 8, 20, 0.5);
 }
 
 * {
@@ -28,11 +51,12 @@
 body {
   margin: 0;
   min-height: 100vh;
+  color: var(--text-color);
   background:
-    radial-gradient(circle at 12% 14%, rgba(216, 180, 254, 0.34), transparent 34%),
-    radial-gradient(circle at 88% 10%, rgba(147, 51, 234, 0.26), transparent 30%),
-    radial-gradient(circle at 50% 110%, rgba(192, 132, 252, 0.3), transparent 42%),
-    linear-gradient(160deg, #fcfbff 0%, #f5ecff 45%, #f8f2ff 100%);
+    radial-gradient(circle at 12% 14%, var(--bg-accent-1), transparent 34%),
+    radial-gradient(circle at 88% 10%, var(--bg-accent-2), transparent 30%),
+    radial-gradient(circle at 50% 110%, var(--bg-accent-3), transparent 42%),
+    var(--bg-surface-gradient);
   background-attachment: fixed;
 }
 
@@ -56,11 +80,11 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 0.8rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--navbar-border);
   background:
-    linear-gradient(95deg, rgba(91, 33, 182, 0.94) 0%, rgba(126, 34, 206, 0.94) 42%, rgba(168, 85, 247, 0.9) 100%);
+    linear-gradient(95deg, var(--navbar-start) 0%, var(--navbar-middle) 42%, var(--navbar-end) 100%);
   backdrop-filter: blur(10px);
-  box-shadow: 0 12px 24px rgba(91, 33, 182, 0.22);
+  box-shadow: 0 12px 24px var(--navbar-shadow);
 }
 
 .brand {
@@ -88,7 +112,7 @@ body {
 }
 
 .nav-links a {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--nav-link-color);
   text-decoration: none;
   padding: 5px 10px;
   border-radius: 10px;
@@ -96,14 +120,22 @@ body {
 }
 
 .nav-links a:hover {
-  background-color: rgba(255, 255, 255, 0.14);
+  background-color: var(--nav-link-hover-bg);
   transform: translateY(-1px);
 }
 
+.theme-toggle-btn,
 .logout-btn {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.5);
   color: #fff;
+}
+
+.theme-toggle-btn:hover,
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  color: #fff !important;
 }
 
 .layout {
@@ -121,7 +153,7 @@ body {
 .toolbar-card,
 .post-card {
   border-radius: 18px;
-  border: 1px solid rgba(233, 213, 255, 0.75);
+  border: 1px solid var(--card-border);
   background: var(--glass);
   backdrop-filter: blur(8px);
 }
@@ -141,7 +173,7 @@ body {
 }
 
 .post-card {
-  box-shadow: 0 12px 28px rgba(76, 29, 149, 0.12);
+  box-shadow: 0 12px 28px var(--card-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -212,7 +244,7 @@ body {
 
 .post-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 34px rgba(76, 29, 149, 0.16);
+  box-shadow: 0 18px 34px var(--card-shadow);
 }
 
 .post-image {
