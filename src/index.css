@@ -17,6 +17,11 @@
   --glass: rgba(255, 255, 255, 0.76);
   --card-border: rgba(233, 213, 255, 0.75);
   --card-shadow: rgba(76, 29, 149, 0.12);
+  --advisor-hero-bg:
+    radial-gradient(circle at 80% 12%, rgba(216, 180, 254, 0.46), transparent 34%),
+    radial-gradient(circle at 16% 90%, rgba(192, 132, 252, 0.3), transparent 35%),
+    rgba(255, 255, 255, 0.82);
+  --advisor-hero-shadow: 0 18px 34px rgba(91, 33, 182, 0.17);
 
   color: var(--text-color);
   background: var(--bg-base);
@@ -42,6 +47,11 @@
   --glass: rgba(22, 16, 37, 0.84);
   --card-border: rgba(168, 85, 247, 0.22);
   --card-shadow: rgba(5, 8, 20, 0.5);
+  --advisor-hero-bg:
+    radial-gradient(circle at 80% 12%, rgba(124, 58, 237, 0.24), transparent 34%),
+    radial-gradient(circle at 16% 90%, rgba(59, 130, 246, 0.16), transparent 38%),
+    rgba(26, 18, 44, 0.92);
+  --advisor-hero-shadow: 0 18px 34px rgba(5, 8, 20, 0.46);
 }
 
 * {
@@ -189,11 +199,8 @@ body {
 }
 
 .advisor-hero-card {
-  background:
-    radial-gradient(circle at 80% 12%, rgba(216, 180, 254, 0.46), transparent 34%),
-    radial-gradient(circle at 16% 90%, rgba(192, 132, 252, 0.3), transparent 35%),
-    rgba(255, 255, 255, 0.82);
-  box-shadow: 0 18px 34px rgba(91, 33, 182, 0.17);
+  background: var(--advisor-hero-bg);
+  box-shadow: var(--advisor-hero-shadow);
 }
 
 .advisor-input-card,
