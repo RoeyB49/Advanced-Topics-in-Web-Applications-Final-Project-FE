@@ -1,7 +1,43 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
+const DEFAULT_API_BASE_URL = "http://localhost:3000/api";
+
+const resolveApiBaseUrl = () => {
+  const rawBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+  if (!rawBaseUrl) {
+    return DEFAULT_API_BASE_URL;
+  }
+
+  const normalizedProtocol = rawBaseUrl
+    .replace(/^https\/\//i, "https://")
+    .replace(/^http\/\//i, "http://");
+
+  // Allow relative base URLs such as /api for same-origin setups.
+  if (normalizedProtocol.startsWith("/")) {
+    return normalizedProtocol.replace(/\/+$/, "");
+  }
+
+  const hasProtocol = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(normalizedProtocol);
+  const withProtocol = hasProtocol
+    ? normalizedProtocol
+    : `${window.location.protocol}//${normalizedProtocol}`;
+
+  try {
+    const parsed = new URL(withProtocol);
+    if (parsed.pathname === "/" || parsed.pathname === "") {
+      parsed.pathname = "/api";
+    }
+    return parsed.toString().replace(/\/+$/, "");
+  } catch {
+    console.warn(
+      `Invalid VITE_API_BASE_URL value: \"${rawBaseUrl}\". Falling back to ${DEFAULT_API_BASE_URL}.`
+    );
+    return DEFAULT_API_BASE_URL;
+  }
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
