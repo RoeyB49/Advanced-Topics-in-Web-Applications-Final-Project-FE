@@ -10,6 +10,7 @@ const resolveApiBaseUrl = () => {
   }
 
   const normalizedProtocol = rawBaseUrl
+    .replace(/^(https?):\/\/(?:https?|http)(?::)?\/\//i, "$1://")
     .replace(/^https\/\//i, "https://")
     .replace(/^http\/\//i, "http://");
 
