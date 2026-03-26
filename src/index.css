@@ -254,6 +254,45 @@ body {
   box-shadow: 0 18px 34px var(--card-shadow);
 }
 
+.social-auth-stack {
+  gap: 10px;
+}
+
+.social-login-btn {
+  height: 36px;
+  border-radius: 12px;
+  border-color: rgba(192, 132, 252, 0.45);
+  background: rgba(8, 10, 20, 0.72);
+  color: rgba(245, 243, 255, 0.96);
+  font-weight: 600;
+}
+
+.social-login-btn:hover,
+.social-login-btn:focus-visible {
+  border-color: rgba(216, 180, 254, 0.7) !important;
+  background: rgba(17, 24, 39, 0.9) !important;
+  color: #fff !important;
+}
+
+.social-google-wrap {
+  position: relative;
+}
+
+.social-google-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.social-google-overlay > div {
+  width: 100%;
+}
+
+[data-theme="dark"] .social-login-btn {
+  background: rgba(7, 9, 16, 0.8);
+  border-color: rgba(168, 85, 247, 0.45);
+}
+
 .post-image {
   width: 100%;
   border-radius: 12px;

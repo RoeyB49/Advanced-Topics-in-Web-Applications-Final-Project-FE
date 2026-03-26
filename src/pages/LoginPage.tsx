@@ -5,7 +5,12 @@ import { useAuth } from "../context/AuthContext";
 import { Alert, Button, Card, Form, Input, Space, Typography } from "antd";
 import { GoogleLogin } from "@react-oauth/google";
 import type { CredentialResponse } from "@react-oauth/google";
-import { FacebookFilled, LockOutlined, MailOutlined } from "@ant-design/icons";
+import {
+  FacebookFilled,
+  GoogleOutlined,
+  LockOutlined,
+  MailOutlined,
+} from "@ant-design/icons";
 
 const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -194,17 +199,33 @@ export const LoginPage = () => {
           <Space
             style={{ marginTop: 12, width: "100%" }}
             orientation="vertical"
+            className="social-auth-stack"
           >
             {GOOGLE_CLIENT_ID ? (
-              <GoogleLogin
-                onSuccess={(credentialResponse: CredentialResponse) =>
-                  onGoogleSuccess(credentialResponse.credential)
-                }
-                onError={() => setError("Google login failed")}
-                useOneTap={false}
-                shape="pill"
-                width="100%"
-              />
+              <div
+                className="social-google-wrap"
+                aria-label="Continue with Google"
+              >
+                <Button
+                  icon={<GoogleOutlined />}
+                  block
+                  className="social-login-btn"
+                >
+                  Continue with Google
+                </Button>
+                <div className="social-google-overlay" aria-hidden="true">
+                  <GoogleLogin
+                    onSuccess={(credentialResponse: CredentialResponse) =>
+                      onGoogleSuccess(credentialResponse.credential)
+                    }
+                    onError={() => setError("Google login failed")}
+                    useOneTap={false}
+                    width="100%"
+                    text="continue_with"
+                    theme="outline"
+                  />
+                </div>
+              </div>
             ) : (
               <Button block disabled>
                 Google login is not configured
@@ -213,6 +234,7 @@ export const LoginPage = () => {
             <Button
               icon={<FacebookFilled />}
               block
+              className="social-login-btn"
               loading={socialLoading}
               onClick={onFacebookLogin}
             >
