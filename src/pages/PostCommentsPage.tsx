@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../services/api";
+import { api, resolveApiAssetUrl } from "../services/api";
 import type { Comment } from "../types";
 import {
   Avatar,
@@ -71,11 +71,7 @@ export const PostCommentsPage = () => {
               <List.Item key={comment._id}>
                 <Space align="start">
                   <Avatar
-                    src={
-                      comment.author.profileImage
-                        ? `http://localhost:3000${comment.author.profileImage}`
-                        : undefined
-                    }
+                    src={resolveApiAssetUrl(comment.author.profileImage)}
                     icon={<UserOutlined />}
                   />
                   <Space orientation="vertical" size={0}>

@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const DEFAULT_API_BASE_URL = "http://localhost:3000/api";
+const DEFAULT_API_BASE_URL = import.meta.env.DEV
+  ? "http://localhost:3000/api"
+  : "/api";
 
 const resolveApiBaseUrl = () => {
   const rawBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
@@ -39,6 +41,40 @@ const resolveApiBaseUrl = () => {
 };
 
 const API_BASE_URL = resolveApiBaseUrl();
+
+const resolveApiOrigin = () => {
+  if (API_BASE_URL.startsWith("/")) {
+    return window.location.origin;
+  }
+
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return window.location.origin;
+  }
+};
+
+const API_ORIGIN = resolveApiOrigin();
+
+export const resolveApiAssetUrl = (assetPath?: string) => {
+  if (!assetPath) {
+    return undefined;
+  }
+
+  if (/^https?:\/\//i.test(assetPath)) {
+    return assetPath;
+  }
+
+  if (assetPath.startsWith("//")) {
+    return `${window.location.protocol}${assetPath}`;
+  }
+
+  const normalizedPath = assetPath.startsWith("/")
+    ? assetPath
+    : `/${assetPath}`;
+
+  return `${API_ORIGIN}${normalizedPath}`;
+};
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
