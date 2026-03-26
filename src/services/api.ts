@@ -62,7 +62,21 @@ export const resolveApiAssetUrl = (assetPath?: string) => {
   }
 
   if (/^https?:\/\//i.test(assetPath)) {
-    return assetPath;
+    try {
+      const parsed = new URL(assetPath);
+      const isLocalhostAsset =
+        parsed.hostname === "localhost" ||
+        parsed.hostname === "127.0.0.1" ||
+        parsed.hostname === "::1";
+
+      if (isLocalhostAsset && parsed.origin !== API_ORIGIN) {
+        return `${API_ORIGIN}${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+
+      return assetPath;
+    } catch {
+      return assetPath;
+    }
   }
 
   if (assetPath.startsWith("//")) {
