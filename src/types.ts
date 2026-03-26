@@ -59,6 +59,8 @@ export interface RecommendationChatResponse {
     preferenceCount: number;
     userSignalCount: number;
   };
+}
+
 export interface IntelligentSearchAI {
   source: "gemini" | "fallback";
   intent: "recommendation" | "comparison" | "analysis" | "general-search";
