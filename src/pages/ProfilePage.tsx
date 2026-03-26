@@ -11,11 +11,12 @@ import {
   Form,
   Input,
   List,
+  Popconfirm,
   Space,
   Typography,
   message,
 } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { DeleteOutlined, UserOutlined } from "@ant-design/icons";
 
 type ProfileResponse = {
   user: {
@@ -61,6 +62,12 @@ export const ProfilePage = () => {
   };
 
   const profileImageSrc = resolveApiAssetUrl(user?.profileImage);
+
+  const deletePost = async (postId: string) => {
+    await api.delete(`/posts/${postId}`);
+    setMyPosts((prev) => prev.filter((post) => post._id !== postId));
+    message.success("Post deleted");
+  };
 
   return (
     <section className="layout">
@@ -113,14 +120,36 @@ export const ProfilePage = () => {
               renderItem={(post) => (
                 <List.Item key={post._id}>
                   <Space
-                    orientation="vertical"
+                    direction="vertical"
                     size={2}
                     style={{ width: "100%" }}
                   >
-                    <Typography.Text>{post.text}</Typography.Text>
-                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                      {new Date(post.createdAt).toLocaleString()}
-                    </Typography.Text>
+                    <Space
+                      style={{ width: "100%", justifyContent: "space-between" }}
+                      align="start"
+                    >
+                      <Space direction="vertical" size={2}>
+                        <Typography.Text>{post.text}</Typography.Text>
+                        <Typography.Text
+                          type="secondary"
+                          style={{ fontSize: 12 }}
+                        >
+                          {new Date(post.createdAt).toLocaleString()}
+                        </Typography.Text>
+                      </Space>
+                      <Popconfirm
+                        title="Delete post"
+                        description="This action cannot be undone."
+                        okText="Delete"
+                        cancelText="Cancel"
+                        okButtonProps={{ danger: true }}
+                        onConfirm={() => deletePost(post._id)}
+                      >
+                        <Button danger icon={<DeleteOutlined />}>
+                          Delete
+                        </Button>
+                      </Popconfirm>
+                    </Space>
                   </Space>
                 </List.Item>
               )}
