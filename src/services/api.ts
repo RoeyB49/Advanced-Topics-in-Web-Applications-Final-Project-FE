@@ -4,13 +4,7 @@ const DEFAULT_API_BASE_URL = import.meta.env.DEV
   ? "http://localhost:3000/api"
   : "/api";
 
-const resolveApiBaseUrl = () => {
-  const rawBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
-
-  if (!rawBaseUrl) {
-    return DEFAULT_API_BASE_URL;
-  }
-
+const normalizeApiBaseUrl = (rawBaseUrl: string) => {
   const normalizedProtocol = rawBaseUrl
     .replace(/^(https?):\/\/(?:https?|http)(?::)?\/\//i, "$1://")
     .replace(/^https\/\//i, "https://")
@@ -26,12 +20,51 @@ const resolveApiBaseUrl = () => {
     ? normalizedProtocol
     : `${window.location.protocol}//${normalizedProtocol}`;
 
-  try {
-    const parsed = new URL(withProtocol);
-    if (parsed.pathname === "/" || parsed.pathname === "") {
-      parsed.pathname = "/api";
+  const parsed = new URL(withProtocol);
+  if (parsed.pathname === "/" || parsed.pathname === "") {
+    parsed.pathname = "/api";
+  }
+
+  return parsed.toString().replace(/\/+$/, "");
+};
+
+const selectApiBaseUrlByHost = (candidates: string[]) => {
+  const currentHost = window.location.hostname;
+
+  const exactHostMatch = candidates.find((candidate) => {
+    if (candidate.startsWith("/")) {
+      return false;
     }
-    return parsed.toString().replace(/\/+$/, "");
+
+    try {
+      return new URL(candidate).hostname === currentHost;
+    } catch {
+      return false;
+    }
+  });
+
+  return exactHostMatch ?? candidates[0];
+};
+
+const resolveApiBaseUrl = () => {
+  const rawBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+  if (!rawBaseUrl) {
+    return DEFAULT_API_BASE_URL;
+  }
+
+  try {
+    const candidates = rawBaseUrl
+      .split(",")
+      .map((item: string) => item.trim())
+      .filter(Boolean)
+      .map(normalizeApiBaseUrl);
+
+    if (!candidates.length) {
+      return DEFAULT_API_BASE_URL;
+    }
+
+    return selectApiBaseUrlByHost(candidates);
   } catch {
     console.warn(
       `Invalid VITE_API_BASE_URL value: \"${rawBaseUrl}\". Falling back to ${DEFAULT_API_BASE_URL}.`
