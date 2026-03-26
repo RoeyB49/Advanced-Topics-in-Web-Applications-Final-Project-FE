@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -93,7 +93,51 @@ export const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [socialLoading, setSocialLoading] = useState(false);
+  const [googleReady, setGoogleReady] = useState(false);
   const navigate = useNavigate();
+
+  const resolveGoogleTrigger = () => {
+    const host = googleButtonHostRef.current;
+    if (!host) {
+      return null;
+    }
+
+    const preferredTrigger = host.querySelector(
+      '[role="button"], iframe, div[tabindex="0"], div[aria-labelledby]',
+    ) as HTMLElement | null;
+
+    return preferredTrigger ?? (host.firstElementChild as HTMLElement | null);
+  };
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) {
+      setGoogleReady(false);
+      return;
+    }
+
+    let mounted = true;
+    let attempts = 0;
+
+    const detectGoogleButton = () => {
+      if (!mounted) {
+        return;
+      }
+
+      const trigger = resolveGoogleTrigger();
+      const isReady = Boolean(trigger);
+      setGoogleReady(isReady);
+      if (!isReady && attempts < 40) {
+        attempts += 1;
+        window.setTimeout(detectGoogleButton, 150);
+      }
+    };
+
+    detectGoogleButton();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -162,16 +206,20 @@ export const LoginPage = () => {
   };
 
   const onGoogleLogin = () => {
-    const googleButton = googleButtonHostRef.current?.querySelector(
-      '[role="button"]',
-    ) as HTMLElement | null;
+    const googleButton = resolveGoogleTrigger();
 
     if (!googleButton) {
       setError("Google login is not ready yet. Please try again.");
       return;
     }
 
-    googleButton.click();
+    googleButton.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+      }),
+    );
   };
 
   return (
@@ -224,6 +272,7 @@ export const LoginPage = () => {
                     block
                     className="social-login-btn"
                     loading={socialLoading}
+                    disabled={!googleReady || socialLoading}
                     onClick={onGoogleLogin}
                   >
                     Continue with Google
