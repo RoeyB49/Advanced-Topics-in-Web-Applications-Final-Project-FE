@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -7,7 +7,6 @@ import { GoogleLogin } from "@react-oauth/google";
 import type { CredentialResponse } from "@react-oauth/google";
 import {
   FacebookFilled,
-  GoogleOutlined,
   LockOutlined,
   MailOutlined,
   MoonOutlined,
@@ -88,56 +87,11 @@ const loadFacebookSdk = () => {
 export const LoginPage = () => {
   const { login, socialLogin } = useAuth();
   const { mode, toggleTheme } = useThemeMode();
-  const googleButtonHostRef = useRef<HTMLDivElement | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [socialLoading, setSocialLoading] = useState(false);
-  const [googleReady, setGoogleReady] = useState(false);
   const navigate = useNavigate();
-
-  const resolveGoogleTrigger = () => {
-    const host = googleButtonHostRef.current;
-    if (!host) {
-      return null;
-    }
-
-    const preferredTrigger = host.querySelector(
-      '[role="button"], iframe, div[tabindex="0"], div[aria-labelledby]',
-    ) as HTMLElement | null;
-
-    return preferredTrigger ?? (host.firstElementChild as HTMLElement | null);
-  };
-
-  useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) {
-      setGoogleReady(false);
-      return;
-    }
-
-    let mounted = true;
-    let attempts = 0;
-
-    const detectGoogleButton = () => {
-      if (!mounted) {
-        return;
-      }
-
-      const trigger = resolveGoogleTrigger();
-      const isReady = Boolean(trigger);
-      setGoogleReady(isReady);
-      if (!isReady && attempts < 40) {
-        attempts += 1;
-        window.setTimeout(detectGoogleButton, 150);
-      }
-    };
-
-    detectGoogleButton();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -205,23 +159,6 @@ export const LoginPage = () => {
     }
   };
 
-  const onGoogleLogin = () => {
-    const googleButton = resolveGoogleTrigger();
-
-    if (!googleButton) {
-      setError("Google login is not ready yet. Please try again.");
-      return;
-    }
-
-    googleButton.dispatchEvent(
-      new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      }),
-    );
-  };
-
   return (
     <section className="center-page login-page-shell">
       <div className="login-layout">
@@ -266,34 +203,16 @@ export const LoginPage = () => {
 
             <div className="social-auth-stack">
               {GOOGLE_CLIENT_ID ? (
-                <div className="social-google-trigger-wrap">
-                  <Button
-                    icon={<GoogleOutlined />}
-                    block
-                    className="social-login-btn"
-                    loading={socialLoading}
-                    disabled={!googleReady || socialLoading}
-                    onClick={onGoogleLogin}
-                  >
-                    Continue with Google
-                  </Button>
-                  <div
-                    className="social-google-hidden"
-                    aria-hidden="true"
-                    ref={googleButtonHostRef}
-                  >
-                    <GoogleLogin
-                      onSuccess={(credentialResponse: CredentialResponse) =>
-                        onGoogleSuccess(credentialResponse.credential)
-                      }
-                      onError={() => setError("Google login failed")}
-                      useOneTap={false}
-                      width="100%"
-                      text="continue_with"
-                      theme="outline"
-                    />
-                  </div>
-                </div>
+                <GoogleLogin
+                  onSuccess={(credentialResponse: CredentialResponse) =>
+                    onGoogleSuccess(credentialResponse.credential)
+                  }
+                  onError={() => setError("Google login failed")}
+                  useOneTap={false}
+                  shape="pill"
+                  width="100%"
+                  text="continue_with"
+                />
               ) : (
                 <Button block disabled className="social-login-btn">
                   Google login is not configured
