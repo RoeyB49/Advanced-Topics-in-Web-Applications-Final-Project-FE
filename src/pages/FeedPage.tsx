@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../services/api";
-import type { IntelligentSearchAI, IntelligentSearchResponse, Post } from "../types";
+import type {
+  IntelligentSearchAI,
+  IntelligentSearchResponse,
+  Post,
+} from "../types";
 import { PostCard } from "../components/PostCard";
 import { Card, Empty, Input, Space, Spin, Tag, Typography } from "antd";
 import { RobotOutlined, SearchOutlined } from "@ant-design/icons";
@@ -88,6 +92,10 @@ export const FeedPage = () => {
     );
   };
 
+  const onPostDeleted = (postId: string) => {
+    setPosts((prev) => prev.filter((post) => post._id !== postId));
+  };
+
   return (
     <section className="layout">
       <Card className="toolbar-card">
@@ -166,7 +174,12 @@ export const FeedPage = () => {
 
       <div className="feed-grid">
         {posts.map((post) => (
-          <PostCard key={post._id} post={post} onLikeChanged={onLikeChanged} />
+          <PostCard
+            key={post._id}
+            post={post}
+            onLikeChanged={onLikeChanged}
+            onDeleted={onPostDeleted}
+          />
         ))}
       </div>
 

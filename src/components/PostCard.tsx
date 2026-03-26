@@ -1,33 +1,53 @@
 import { Link } from "react-router-dom";
-import { api } from "../services/api";
+import { api, resolveApiAssetUrl } from "../services/api";
 import type { Post } from "../types";
-import { Button, Card, Space, Tag, Tooltip, Typography } from "antd";
 import {
+  Button,
+  Card,
+  Popconfirm,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+  message,
+} from "antd";
+import {
+  DeleteOutlined,
   EditOutlined,
   HeartOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 type Props = {
   post: Post;
   onLikeChanged: (post: Post) => void;
+  onDeleted?: (postId: string) => void;
 };
 
-export const PostCard = ({ post, onLikeChanged }: Props) => {
+export const PostCard = ({ post, onLikeChanged, onDeleted }: Props) => {
   const { user } = useAuth();
+  const [deleting, setDeleting] = useState(false);
   const authorName = post.author?.username ?? "Unknown user";
   const likesCount = post.likesCount ?? post.likes?.length ?? 0;
   const isOwner = user?._id === post.author?._id;
-  const imageSrc = post.imageUrl
-    ? post.imageUrl.startsWith("http")
-      ? post.imageUrl
-      : `${api}${post.imageUrl}`
-    : undefined;
+  const imageSrc = resolveApiAssetUrl(post.imageUrl);
 
   const toggleLike = async () => {
     const response = await api.post<Post>(`/posts/${post._id}/like`);
     onLikeChanged(response.data);
+  };
+
+  const deletePost = async () => {
+    setDeleting(true);
+    try {
+      await api.delete(`/posts/${post._id}`);
+      onDeleted?.(post._id);
+      message.success("Post deleted");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -61,9 +81,23 @@ export const PostCard = ({ post, onLikeChanged }: Props) => {
           </Button>
         </Link>
         {isOwner ? (
-          <Link to={`/posts/${post._id}/edit`}>
-            <Button icon={<EditOutlined />}>Edit</Button>
-          </Link>
+          <>
+            <Link to={`/posts/${post._id}/edit`}>
+              <Button icon={<EditOutlined />}>Edit</Button>
+            </Link>
+            <Popconfirm
+              title="Delete post"
+              description="This action cannot be undone."
+              okText="Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true, loading: deleting }}
+              onConfirm={deletePost}
+            >
+              <Button danger icon={<DeleteOutlined />} loading={deleting}>
+                Delete
+              </Button>
+            </Popconfirm>
+          </>
         ) : (
           <Tooltip title="You can only edit your own posts">
             <Button icon={<EditOutlined />} disabled>
