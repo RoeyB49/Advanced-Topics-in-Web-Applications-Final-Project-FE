@@ -310,6 +310,20 @@ body {
   gap: 12px;
 }
 
+.social-google-trigger-wrap {
+  position: relative;
+}
+
+.social-google-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .login-panel .social-login-btn {
   height: 48px;
   border-radius: 12px;
@@ -325,20 +339,6 @@ body {
   border-color: #8b5cf6 !important;
   background: #f2eaff !important;
   color: #30264f !important;
-}
-
-.social-google-trigger-wrap {
-  position: relative;
-}
-
-.social-google-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-  z-index: -1;
 }
 
 .login-divider {
