@@ -203,16 +203,18 @@ export const LoginPage = () => {
 
             <div className="social-auth-stack">
               {GOOGLE_CLIENT_ID ? (
-                <GoogleLogin
-                  onSuccess={(credentialResponse: CredentialResponse) =>
-                    onGoogleSuccess(credentialResponse.credential)
-                  }
-                  onError={() => setError("Google login failed")}
-                  useOneTap={false}
-                  shape="pill"
-                  width="100%"
-                  text="continue_with"
-                />
+                <div className="google-login-shell">
+                  <GoogleLogin
+                    onSuccess={(credentialResponse: CredentialResponse) =>
+                      onGoogleSuccess(credentialResponse.credential)
+                    }
+                    onError={() => setError("Google login failed")}
+                    useOneTap={false}
+                    shape="pill"
+                    size="large"
+                    text="continue_with"
+                  />
+                </div>
               ) : (
                 <Button block disabled className="social-login-btn">
                   Google login is not configured
