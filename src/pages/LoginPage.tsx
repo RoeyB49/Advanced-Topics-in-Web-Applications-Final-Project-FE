@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Alert, Button, Card, Form, Input, Space, Typography } from "antd";
+import { Alert, Button, Divider, Form, Input, Typography } from "antd";
 import { GoogleLogin } from "@react-oauth/google";
 import type { CredentialResponse } from "@react-oauth/google";
 import {
@@ -10,7 +10,10 @@ import {
   GoogleOutlined,
   LockOutlined,
   MailOutlined,
+  MoonOutlined,
+  SunOutlined,
 } from "@ant-design/icons";
+import { useThemeMode } from "../context/ThemeContext";
 
 const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -84,6 +87,8 @@ const loadFacebookSdk = () => {
 
 export const LoginPage = () => {
   const { login, socialLogin } = useAuth();
+  const { mode, toggleTheme } = useThemeMode();
+  const googleButtonHostRef = useRef<HTMLDivElement | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -156,93 +161,163 @@ export const LoginPage = () => {
     }
   };
 
+  const onGoogleLogin = () => {
+    const googleButton = googleButtonHostRef.current?.querySelector(
+      '[role="button"]',
+    ) as HTMLElement | null;
+
+    if (!googleButton) {
+      setError("Google login is not ready yet. Please try again.");
+      return;
+    }
+
+    googleButton.click();
+  };
+
   return (
-    <section className="center-page">
-      <Card
-        className="form-card"
-        title={<Typography.Title level={3}>Welcome to Animon</Typography.Title>}
-      >
-        <Typography.Paragraph type="secondary">
-          Log in to review anime and see what others recommend.
-        </Typography.Paragraph>
-        <Form layout="vertical" onSubmitCapture={onSubmit}>
-          <Form.Item label="Email" required>
-            <Input
-              prefix={<MailOutlined />}
-              placeholder="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+    <section className="center-page login-page-shell">
+      <div className="login-layout">
+        <aside className="login-showcase">
+          <Typography.Paragraph className="showcase-kicker">
+            Track what you loved. Discover what to watch next.
+          </Typography.Paragraph>
+          <Typography.Title level={1} className="showcase-title">
+            Get anime picks tuned to your taste
+          </Typography.Title>
+          <div className="showcase-art">
+            <img
+              src="/favicon.svg"
+              alt="Animon icon"
+              className="showcase-art-favicon"
             />
-          </Form.Item>
-          <Form.Item label="Password" required>
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </Form.Item>
-          {error ? (
-            <Alert
-              type="error"
-              showIcon
-              message={error}
-              style={{ marginBottom: 12 }}
-            />
-          ) : null}
-          <Button type="primary" htmlType="submit" block>
-            Login
-          </Button>
-          <Space
-            style={{ marginTop: 12, width: "100%" }}
-            orientation="vertical"
-            className="social-auth-stack"
-          >
-            {GOOGLE_CLIENT_ID ? (
-              <div
-                className="social-google-wrap"
-                aria-label="Continue with Google"
+          </div>
+          <Typography.Paragraph className="showcase-footnote">
+            From shonen hype to cozy slice-of-life, your next favorite is here.
+          </Typography.Paragraph>
+        </aside>
+
+        <div className="login-panel">
+          <div className="login-panel-inner">
+            <div className="login-panel-top">
+              <Button
+                size="small"
+                onClick={toggleTheme}
+                icon={mode === "light" ? <MoonOutlined /> : <SunOutlined />}
+                className="theme-toggle-btn login-theme-toggle"
               >
-                <Button
-                  icon={<GoogleOutlined />}
-                  block
-                  className="social-login-btn"
-                >
-                  Continue with Google
-                </Button>
-                <div className="social-google-overlay" aria-hidden="true">
-                  <GoogleLogin
-                    onSuccess={(credentialResponse: CredentialResponse) =>
-                      onGoogleSuccess(credentialResponse.credential)
-                    }
-                    onError={() => setError("Google login failed")}
-                    useOneTap={false}
-                    width="100%"
-                    text="continue_with"
-                    theme="outline"
-                  />
-                </div>
-              </div>
-            ) : (
-              <Button block disabled>
-                Google login is not configured
+                {mode === "light" ? "Dark" : "Light"}
               </Button>
-            )}
-            <Button
-              icon={<FacebookFilled />}
-              block
-              className="social-login-btn"
-              loading={socialLoading}
-              onClick={onFacebookLogin}
+            </div>
+            <Typography.Title level={2} className="auth-title">
+              Welcome to Animon
+            </Typography.Title>
+            <Typography.Paragraph className="login-subtext">
+              Log in to rate, review, and get personalized anime
+              recommendations.
+            </Typography.Paragraph>
+
+            <div className="social-auth-stack">
+              {GOOGLE_CLIENT_ID ? (
+                <div className="social-google-trigger-wrap">
+                  <Button
+                    icon={<GoogleOutlined />}
+                    block
+                    className="social-login-btn"
+                    loading={socialLoading}
+                    onClick={onGoogleLogin}
+                  >
+                    Continue with Google
+                  </Button>
+                  <div
+                    className="social-google-hidden"
+                    aria-hidden="true"
+                    ref={googleButtonHostRef}
+                  >
+                    <GoogleLogin
+                      onSuccess={(credentialResponse: CredentialResponse) =>
+                        onGoogleSuccess(credentialResponse.credential)
+                      }
+                      onError={() => setError("Google login failed")}
+                      useOneTap={false}
+                      width="100%"
+                      text="continue_with"
+                      theme="outline"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <Button block disabled className="social-login-btn">
+                  Google login is not configured
+                </Button>
+              )}
+
+              <Button
+                icon={<FacebookFilled />}
+                block
+                className="social-login-btn"
+                loading={socialLoading}
+                onClick={onFacebookLogin}
+              >
+                Continue with Facebook
+              </Button>
+            </div>
+
+            <Divider className="login-divider">or</Divider>
+
+            <Form
+              layout="vertical"
+              onSubmitCapture={onSubmit}
+              className="login-form"
             >
-              Continue with Facebook
-            </Button>
-          </Space>
-        </Form>
-      </Card>
+              <Form.Item>
+                <Input
+                  prefix={<MailOutlined />}
+                  placeholder="Email address"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  size="large"
+                />
+              </Form.Item>
+              <Form.Item>
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  size="large"
+                />
+              </Form.Item>
+
+              {error ? (
+                <Alert
+                  type="error"
+                  showIcon
+                  message={error}
+                  style={{ marginBottom: 12 }}
+                />
+              ) : null}
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                className="login-btn"
+              >
+                Login
+              </Button>
+
+              <Link to="/register" className="register-link-btn-wrap">
+                <Button block className="register-link-btn">
+                  Create a new account
+                </Button>
+              </Link>
+            </Form>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
