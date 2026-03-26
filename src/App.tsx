@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { FeedPage } from "./pages/FeedPage";
@@ -10,10 +10,14 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
 
 function App() {
+  const location = useLocation();
+  const showNavbar = location.pathname !== "/login";
+  const mainClassName = showNavbar ? "app-main" : "app-main login-main";
+
   return (
     <>
-      <Navbar />
-      <main className="app-main">
+      {showNavbar ? <Navbar /> : null}
+      <main className={mainClassName}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Button, Layout, Space, Typography } from "antd";
 import {
@@ -16,6 +16,8 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
   const { mode, toggleTheme } = useThemeMode();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
 
   const onLogout = async () => {
     await logout();
@@ -24,18 +26,22 @@ export const Navbar = () => {
 
   return (
     <Layout.Header className="navbar">
-      <Link to="/" className="brand">
-        <Space size={10} align="center">
-          <img
-            src="/branding/app-logo.svg"
-            alt="Animon logo"
-            className="brand-logo"
-          />
-          <Typography.Title level={4} style={{ color: "#fff", margin: 0 }}>
-            Animon
-          </Typography.Title>
-        </Space>
-      </Link>
+      {isLoginPage ? (
+        <div />
+      ) : (
+        <Link to="/" className="brand">
+          <Space size={10} align="center">
+            <img
+              src="/branding/app-logo.svg"
+              alt="Animon logo"
+              className="brand-logo"
+            />
+            <Typography.Title level={4} style={{ color: "#fff", margin: 0 }}>
+              Animon
+            </Typography.Title>
+          </Space>
+        </Link>
+      )}
       <Space size="middle" className="nav-links">
         <Button
           size="small"
@@ -45,7 +51,7 @@ export const Navbar = () => {
         >
           {mode === "light" ? "Dark" : "Light"}
         </Button>
-        {user ? (
+        {isLoginPage ? null : user ? (
           <>
             <Link to="/">
               <HomeOutlined /> Feed
