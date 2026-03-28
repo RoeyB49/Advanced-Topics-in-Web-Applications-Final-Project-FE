@@ -125,10 +125,15 @@ export const ProfilePage = () => {
                     style={{ width: "100%" }}
                   >
                     <Space
+                      className="profile-post-row"
                       style={{ width: "100%", justifyContent: "space-between" }}
                       align="start"
                     >
-                      <Space direction="vertical" size={2}>
+                      <Space
+                        direction="vertical"
+                        size={2}
+                        className="profile-post-text"
+                      >
                         <Typography.Text>{post.text}</Typography.Text>
                         <Typography.Text
                           type="secondary"

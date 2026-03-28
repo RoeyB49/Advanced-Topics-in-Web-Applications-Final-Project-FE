@@ -71,7 +71,10 @@ export const PostCard = ({ post, onLikeChanged, onDeleted }: Props) => {
       {post.imageUrl ? (
         <img src={imageSrc} alt="post" className="post-image" />
       ) : null}
-      <Space style={{ marginTop: 12, display: "flex", flexWrap: "wrap" }}>
+      <Space
+        className="post-card-actions"
+        style={{ marginTop: 12, display: "flex", flexWrap: "wrap" }}
+      >
         <Button icon={<HeartOutlined />} onClick={toggleLike}>
           Like ({likesCount})
         </Button>
