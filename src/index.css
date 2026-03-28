@@ -310,18 +310,22 @@ body {
   gap: 12px;
 }
 
-.social-google-trigger-wrap {
+.social-google-wrap {
   position: relative;
 }
 
-.social-google-hidden {
+.social-google-overlay {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+  inset: 0;
   opacity: 0;
+}
+
+.social-google-overlay > div {
+  width: 100%;
+}
+
+.social-google-wrap.is-loading .social-google-overlay {
   pointer-events: none;
-  z-index: -1;
 }
 
 .login-panel .social-login-btn {
@@ -336,6 +340,13 @@ body {
 
 .login-panel .social-login-btn:hover,
 .login-panel .social-login-btn:focus-visible {
+  border-color: #8b5cf6 !important;
+  background: #f2eaff !important;
+  color: #30264f !important;
+}
+
+.social-google-wrap:hover .social-login-btn,
+.social-google-wrap:focus-within .social-login-btn {
   border-color: #8b5cf6 !important;
   background: #f2eaff !important;
   color: #30264f !important;
@@ -440,6 +451,13 @@ body {
 
 [data-theme="dark"] .login-panel .social-login-btn:hover,
 [data-theme="dark"] .login-panel .social-login-btn:focus-visible {
+  background: #2d1e45 !important;
+  color: #f7f1ff !important;
+  border-color: #7c3aed !important;
+}
+
+[data-theme="dark"] .social-google-wrap:hover .social-login-btn,
+[data-theme="dark"] .social-google-wrap:focus-within .social-login-btn {
   background: #2d1e45 !important;
   color: #f7f1ff !important;
   border-color: #7c3aed !important;

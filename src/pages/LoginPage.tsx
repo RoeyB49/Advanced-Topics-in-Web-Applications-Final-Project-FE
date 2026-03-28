@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -88,63 +88,11 @@ const loadFacebookSdk = () => {
 export const LoginPage = () => {
   const { login, socialLogin } = useAuth();
   const { mode, toggleTheme } = useThemeMode();
-  const googleTriggerHostRef = useRef<HTMLDivElement | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [socialLoading, setSocialLoading] = useState(false);
-  const [googleReady, setGoogleReady] = useState(false);
   const navigate = useNavigate();
-
-  const resolveGoogleTrigger = () => {
-    const host = googleTriggerHostRef.current;
-    if (!host) {
-      return null;
-    }
-
-    return host.querySelector(
-      'iframe, [role="button"], div[aria-labelledby], div[tabindex="0"]',
-    ) as HTMLElement | null;
-  };
-
-  useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) {
-      setGoogleReady(false);
-      return;
-    }
-
-    let mounted = true;
-    let attempts = 0;
-
-    const syncReadyState = () => {
-      if (!mounted) {
-        return;
-      }
-
-      const isReady = Boolean(resolveGoogleTrigger());
-      setGoogleReady(isReady);
-
-      if (!isReady && attempts < 50) {
-        attempts += 1;
-        window.setTimeout(syncReadyState, 120);
-      }
-    };
-
-    const host = googleTriggerHostRef.current;
-    if (!host) {
-      syncReadyState();
-      return;
-    }
-
-    const observer = new MutationObserver(syncReadyState);
-    observer.observe(host, { childList: true, subtree: true });
-    syncReadyState();
-
-    return () => {
-      mounted = false;
-      observer.disconnect();
-    };
-  }, []);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -212,22 +160,6 @@ export const LoginPage = () => {
     }
   };
 
-  const onGoogleLogin = () => {
-    const trigger = resolveGoogleTrigger();
-    if (!trigger) {
-      setError("Google login is still initializing. Please try again.");
-      return;
-    }
-
-    trigger.dispatchEvent(
-      new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      }),
-    );
-  };
-
   return (
     <section className="center-page login-page-shell">
       <div className="login-layout">
@@ -272,31 +204,29 @@ export const LoginPage = () => {
 
             <div className="social-auth-stack">
               {GOOGLE_CLIENT_ID ? (
-                <div className="social-google-trigger-wrap">
+                <div
+                  className={`social-google-wrap${socialLoading ? " is-loading" : ""}`}
+                  aria-label="Continue with Google"
+                >
                   <Button
                     icon={<GoogleOutlined />}
                     block
                     className="social-login-btn"
                     loading={socialLoading}
-                    disabled={!googleReady || socialLoading}
-                    onClick={onGoogleLogin}
+                    disabled={socialLoading}
                   >
                     Continue with Google
                   </Button>
-                  <div
-                    className="social-google-hidden"
-                    aria-hidden="true"
-                    ref={googleTriggerHostRef}
-                  >
+                  <div className="social-google-overlay" aria-hidden="true">
                     <GoogleLogin
                       onSuccess={(credentialResponse: CredentialResponse) =>
                         onGoogleSuccess(credentialResponse.credential)
                       }
                       onError={() => setError("Google login failed")}
                       useOneTap={false}
-                      shape="pill"
-                      size="large"
+                      width="100%"
                       text="continue_with"
+                      theme="outline"
                     />
                   </div>
                 </div>
