@@ -8,12 +8,20 @@ export interface User {
   provider?: Provider;
 }
 
+export interface LikeUser {
+  _id: string;
+  username?: string;
+  profileImage?: string;
+}
+
 export interface Post {
   _id: string;
   text: string;
   imageUrl?: string;
+  tags?: string[];
   author: User;
-  likes: string[];
+  likes: Array<string | LikeUser>;
+  likedByUsers?: LikeUser[];
   likesCount?: number;
   commentsCount?: number;
   createdAt: string;

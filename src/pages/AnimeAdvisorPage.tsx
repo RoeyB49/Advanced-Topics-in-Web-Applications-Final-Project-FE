@@ -38,6 +38,21 @@ const moodColor = (mood: string) => {
   return "blue";
 };
 
+const renderAdvisorText = (text: string) => {
+  // Convert *title* fragments from the assistant into bold text.
+  const parts = text.split(/(\*[^*]+\*)/g);
+
+  return parts.map((part, index) => {
+    const isWrappedWithAsterisks = /^\*[^*]+\*$/.test(part);
+    if (!isWrappedWithAsterisks) {
+      return <span key={`text-${index}`}>{part}</span>;
+    }
+
+    const content = part.slice(1, -1).trim();
+    return <strong key={`text-${index}`}>{content}</strong>;
+  });
+};
+
 export const AnimeAdvisorPage = () => {
   type ExternalAnimeInfo = {
     imageUrl?: string;
@@ -287,7 +302,9 @@ export const AnimeAdvisorPage = () => {
                       key={`${entry.role}-${index}`}
                       className={`advisor-bubble advisor-bubble-${entry.role}`}
                     >
-                      <Typography.Text>{entry.text}</Typography.Text>
+                      <Typography.Text>
+                        {renderAdvisorText(entry.text)}
+                      </Typography.Text>
                     </div>
                   ))}
                 </div>
@@ -308,7 +325,7 @@ export const AnimeAdvisorPage = () => {
                   </Space>
 
                   <Typography.Paragraph style={{ marginBottom: 4 }}>
-                    {response.reply}
+                    {renderAdvisorText(response.reply)}
                   </Typography.Paragraph>
 
                   <Button
@@ -344,7 +361,7 @@ export const AnimeAdvisorPage = () => {
             </Space>
 
             <Typography.Paragraph style={{ marginBottom: 4 }}>
-              {response.reply}
+              {renderAdvisorText(response.reply)}
             </Typography.Paragraph>
 
             <Space wrap>

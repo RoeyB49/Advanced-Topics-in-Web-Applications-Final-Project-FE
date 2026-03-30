@@ -3,13 +3,19 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Alert, Button, Card, Form, Input, Typography } from "antd";
-import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  LockOutlined,
+  MailOutlined,
+  UploadOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
 export const RegisterPage = () => {
   const { register } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -17,7 +23,7 @@ export const RegisterPage = () => {
     event.preventDefault();
     setError("");
     try {
-      await register(username, email, password);
+      await register(username, email, password, image);
       navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.message ?? "Registration failed");
@@ -62,6 +68,14 @@ export const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+            />
+          </Form.Item>
+          <Form.Item label="Profile picture (optional)">
+            <Input
+              type="file"
+              accept="image/*"
+              prefix={<UploadOutlined />}
+              onChange={(e) => setImage(e.target.files?.[0] ?? null)}
             />
           </Form.Item>
           {error ? (
