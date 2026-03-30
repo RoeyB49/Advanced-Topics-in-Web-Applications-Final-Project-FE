@@ -18,6 +18,7 @@ type AuthContextType = {
     username: string,
     email: string,
     password: string,
+    image?: File | null,
   ) => Promise<void>;
   socialLogin: (
     provider: "google" | "facebook",
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     username: string,
     email: string,
     password: string,
+    image?: File | null,
   ) => {
     const response = await api.post<AuthResponse>("/auth/register", {
       username,
@@ -88,6 +90,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password,
     });
     applyAuth(response.data);
+
+    if (image && response.data.user?._id) {
+      try {
+        const imageFormData = new FormData();
+        imageFormData.append("username", username);
+        imageFormData.append("image", image);
+
+        await api.put(`/users/${response.data.user._id}`, imageFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        await refreshProfile();
+      } catch {
+        // If image upload fails, keep the successful registration session.
+      }
+    }
   };
 
   const socialLogin = async (

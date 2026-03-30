@@ -6,7 +6,16 @@ import type {
   Post,
 } from "../types";
 import { PostCard } from "../components/PostCard";
-import { Card, Empty, Input, Space, Spin, Tag, Typography } from "antd";
+import {
+  Card,
+  Empty,
+  Input,
+  Segmented,
+  Space,
+  Spin,
+  Tag,
+  Typography,
+} from "antd";
 import { RobotOutlined, SearchOutlined } from "@ant-design/icons";
 
 type FeedResponse = {
@@ -15,15 +24,116 @@ type FeedResponse = {
   currentPage: number;
 };
 
+const SEARCH_PLACEHOLDERS = [
+  "Try 'shows like Solo Leveling' or #fantasy #action",
+  "Search 'sad romance with a twist' or #drama #shojo",
+  "Describe a vibe or use tags: #isekai #comedy",
+];
+
+const SIMPLE_SEARCH_TAGS = [
+  "shonen",
+  "seinen",
+  "shojo",
+  "isekai",
+  "mecha",
+  "romance",
+  "comedy",
+  "drama",
+  "action",
+  "mystery",
+  "thriller",
+  "slice-of-life",
+  "psychological",
+  "fantasy",
+  "sports",
+  "classic",
+  "must-watch",
+  "underrated",
+];
+
+const SIMPLE_SEARCH_TAG_ALIASES: Record<string, string> = {
+  "slice of life": "slice-of-life",
+  sliceoflife: "slice-of-life",
+  "must watch": "must-watch",
+  mustwatch: "must-watch",
+};
+
+const parseSimpleSearchQuery = (rawQuery: string) => {
+  const knownTagSet = new Set(SIMPLE_SEARCH_TAGS);
+  const lowerQuery = rawQuery.toLowerCase();
+
+  const hashtagTags = Array.from(rawQuery.matchAll(/#([\w-]+)/g))
+    .map((match) => match[1].toLowerCase())
+    .filter((tag) => knownTagSet.has(tag));
+
+  const aliasTags = Object.entries(SIMPLE_SEARCH_TAG_ALIASES)
+    .filter(([alias]) => lowerQuery.includes(alias))
+    .map(([, normalized]) => normalized);
+
+  let strippedQuery = lowerQuery.replace(/#[\w-]+/g, " ");
+  Object.keys(SIMPLE_SEARCH_TAG_ALIASES).forEach((alias) => {
+    strippedQuery = strippedQuery.replaceAll(alias, " ");
+  });
+
+  const plainTokenTags = strippedQuery
+    .split(/[^a-z0-9-]+/)
+    .filter(Boolean)
+    .filter((token) => knownTagSet.has(token));
+
+  const tags = Array.from(
+    new Set([...hashtagTags, ...aliasTags, ...plainTokenTags]),
+  );
+
+  const textQuery = strippedQuery
+    .split(/\s+/)
+    .filter((word) => word.length > 0 && !knownTagSet.has(word))
+    .join(" ")
+    .trim();
+
+  return {
+    tags,
+    textQuery,
+  };
+};
+
+const filterPostsForSimpleSearch = (
+  sourcePosts: Post[],
+  textQuery: string,
+  tags: string[],
+) => {
+  const textNeedle = textQuery.toLowerCase();
+
+  return sourcePosts.filter((post) => {
+    const textMatch =
+      !textNeedle ||
+      [post.text, post.author?.username]
+        .join(" ")
+        .toLowerCase()
+        .includes(textNeedle);
+
+    const postTags = (post.tags ?? []).map((tag) => tag.toLowerCase());
+    const tagsMatch = tags.every((tag) => postTags.includes(tag));
+
+    return textMatch && tagsMatch;
+  });
+};
+
 export const FeedPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchMode, setSearchMode] = useState<"ai" | "simple">("ai");
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isSearchResult, setIsSearchResult] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [searchAI, setSearchAI] = useState<IntelligentSearchAI | null>(null);
 
-  const canLoadMore = useMemo(() => hasMore && !loading, [hasMore, loading]);
+  const canLoadMore = useMemo(
+    () => hasMore && !loading && !searchLoading && !isSearchResult,
+    [hasMore, loading, searchLoading, isSearchResult],
+  );
 
   const fetchPage = async (targetPage: number) => {
     setLoading(true);
@@ -47,6 +157,16 @@ export const FeedPage = () => {
   }, []);
 
   useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setPlaceholderIndex(
+        (prevIndex) => (prevIndex + 1) % SEARCH_PLACEHOLDERS.length,
+      );
+    }, 4500);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => {
       const reachedBottom =
         window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
@@ -59,22 +179,85 @@ export const FeedPage = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, [canLoadMore, page]);
 
-  const onSearch = async () => {
-    if (!query.trim()) {
-      setSearchAI(null);
-      fetchPage(1);
+  const runSimpleSearch = async (normalizedQuery: string) => {
+    const { tags, textQuery } = parseSimpleSearchQuery(normalizedQuery);
+    const queryParams = new URLSearchParams();
+
+    queryParams.set("q", textQuery);
+    tags.forEach((tag) => queryParams.append("tags[]", tag));
+
+    const queryString = queryParams.toString();
+
+    const endpoints = [
+      `/posts/search/simple?${queryString}`,
+      `/posts/search?${queryString}`,
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await api.get<FeedResponse | Post[]>(endpoint);
+        const payload = response.data;
+        if (Array.isArray(payload)) {
+          return filterPostsForSimpleSearch(payload, textQuery, tags);
+        }
+        if (Array.isArray(payload.posts)) {
+          return filterPostsForSimpleSearch(payload.posts, textQuery, tags);
+        }
+      } catch {
+        // Try the next endpoint if the current one is unavailable.
+      }
+    }
+
+    const fallbackResponse = await api.get<FeedResponse>(
+      `/posts?page=1&limit=100`,
+    );
+    return filterPostsForSimpleSearch(
+      fallbackResponse.data.posts,
+      textQuery,
+      tags,
+    );
+  };
+
+  const resetToAllPosts = async () => {
+    setSearchAI(null);
+    setIsSearchResult(false);
+    setHasMore(true);
+    await fetchPage(1);
+  };
+
+  const onSearch = async (incomingValue?: string) => {
+    const normalizedQuery = (incomingValue ?? query).trim();
+    if (!normalizedQuery) {
+      await resetToAllPosts();
       return;
     }
-    setLoading(true);
+
+    setSearchLoading(true);
     try {
-      const response = await api.get<IntelligentSearchResponse>(
-        `/posts/search/intelligent?q=${encodeURIComponent(query)}`,
-      );
-      setPosts(response.data.posts);
-      setSearchAI(response.data.ai);
+      if (searchMode === "ai") {
+        const response = await api.get<IntelligentSearchResponse>(
+          `/posts/search/intelligent?q=${encodeURIComponent(normalizedQuery)}`,
+        );
+        setPosts(response.data.posts);
+        setSearchAI(response.data.ai);
+      } else {
+        const simpleResults = await runSimpleSearch(normalizedQuery);
+        setPosts(simpleResults);
+        setSearchAI(null);
+      }
+
+      setIsSearchResult(true);
       setHasMore(false);
     } finally {
-      setLoading(false);
+      setSearchLoading(false);
+    }
+  };
+
+  const onQueryChange = (nextValue: string) => {
+    const hadValue = query.trim().length > 0;
+    setQuery(nextValue);
+    if (hadValue && nextValue.trim().length === 0) {
+      void resetToAllPosts();
     }
   };
 
@@ -85,7 +268,9 @@ export const FeedPage = () => {
           ? {
               ...post,
               likes: updatedPost.likes,
-              likesCount: updatedPost.likes?.length ?? 0,
+              likedByUsers: updatedPost.likedByUsers,
+              likesCount:
+                updatedPost.likesCount ?? updatedPost.likes?.length ?? 0,
             }
           : post,
       ),
@@ -104,21 +289,41 @@ export const FeedPage = () => {
             Explore Animon Reviews
           </Typography.Title>
           <Typography.Text type="secondary">
-            Search by title, genre, or mood and let AI surface relevant anime
-            takes.
+            Search by title, genre, or mood. Choose Smart search for AI intent
+            analysis or Simple search for faster results.
           </Typography.Text>
+          <div className="feed-search-controls">
+            <Segmented
+              value={searchMode}
+              options={[
+                { label: "Smart (AI)", value: "ai" },
+                { label: "Simple", value: "simple" },
+              ]}
+              onChange={(value) => setSearchMode(value as "ai" | "simple")}
+            />
+            {searchLoading ? (
+              <Space size={8}>
+                <Spin size="small" />
+                <Typography.Text type="secondary">Searching...</Typography.Text>
+              </Space>
+            ) : null}
+          </div>
           <Input.Search
             enterButton={
               <>
                 <SearchOutlined /> Search
               </>
             }
+            allowClear
             size="large"
-            prefix={<RobotOutlined />}
-            placeholder="Try: psychological thriller, found family, best mecha finales"
+            prefix={
+              searchMode === "ai" ? <RobotOutlined /> : <SearchOutlined />
+            }
+            placeholder={SEARCH_PLACEHOLDERS[placeholderIndex]}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onSearch={onSearch}
+            loading={searchLoading}
+            onChange={(e) => onQueryChange(e.target.value)}
+            onSearch={(value) => void onSearch(value)}
           />
         </Space>
       </Card>

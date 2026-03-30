@@ -3,15 +3,46 @@ import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../services/api";
 import type { Post } from "../types";
-import { Button, Card, Form, Input, Space, Typography, message } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  Select,
+  Space,
+  Typography,
+  message,
+} from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
+
+const TAG_SUGGESTIONS = [
+  "shonen",
+  "seinen",
+  "shojo",
+  "isekai",
+  "mecha",
+  "romance",
+  "comedy",
+  "drama",
+  "action",
+  "mystery",
+  "thriller",
+  "slice-of-life",
+  "psychological",
+  "fantasy",
+  "sports",
+  "classic",
+  "must-watch",
+  "underrated",
+];
 
 export const PostEditorPage = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [text, setText] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [image, setImage] = useState<File | null>(null);
   const [loadingPost, setLoadingPost] = useState(Boolean(postId));
   const [canEdit, setCanEdit] = useState(!postId);
@@ -33,6 +64,7 @@ export const PostEditorPage = () => {
 
         setCanEdit(true);
         setText(response.data.text);
+        setTags(response.data.tags ?? []);
       })
       .catch(() => {
         message.error("Unable to load this post.");
@@ -47,6 +79,7 @@ export const PostEditorPage = () => {
 
     const formData = new FormData();
     formData.append("text", text);
+    tags.forEach((tag) => formData.append("tags[]", tag));
     if (image) {
       formData.append("image", image);
     }
@@ -90,6 +123,31 @@ export const PostEditorPage = () => {
               accept="image/*"
               prefix={<UploadOutlined />}
               onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+            />
+          </Form.Item>
+          <Form.Item label="Tags">
+            <Select
+              mode="tags"
+              allowClear
+              value={tags}
+              placeholder="Add tags like isekai, romance, must-watch"
+              options={TAG_SUGGESTIONS.map((tag) => ({
+                value: tag,
+                label: tag,
+              }))}
+              onChange={(values) =>
+                setTags(
+                  Array.from(
+                    new Set(
+                      values
+                        .map((value) => value.trim())
+                        .filter((value) => value.length > 0),
+                    ),
+                  ),
+                )
+              }
+              tokenSeparators={[",", " "]}
+              maxTagCount="responsive"
             />
           </Form.Item>
           <Space>
