@@ -126,7 +126,9 @@ const buildFallbackQueriesFromAI = (searchAI: IntelligentSearchAI) => {
     fallbackQueries.push(primaryTitle);
 
     if (searchAI.detectedGenres.length) {
-      fallbackQueries.push(`${primaryTitle} ${searchAI.detectedGenres.join(" ")}`);
+      fallbackQueries.push(
+        `${primaryTitle} ${searchAI.detectedGenres.join(" ")}`,
+      );
     }
   }
 
