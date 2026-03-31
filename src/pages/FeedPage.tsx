@@ -118,6 +118,25 @@ const filterPostsForSimpleSearch = (
   });
 };
 
+const buildFallbackQueriesFromAI = (searchAI: IntelligentSearchAI) => {
+  const fallbackQueries: string[] = [];
+  const primaryTitle = searchAI.detectedAnimeTitles[0]?.trim();
+
+  if (primaryTitle) {
+    fallbackQueries.push(primaryTitle);
+
+    if (searchAI.detectedGenres.length) {
+      fallbackQueries.push(`${primaryTitle} ${searchAI.detectedGenres.join(" ")}`);
+    }
+  }
+
+  if (searchAI.keywords.length) {
+    fallbackQueries.push(searchAI.keywords.join(" "));
+  }
+
+  return Array.from(new Set(fallbackQueries.filter(Boolean)));
+};
+
 export const FeedPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [query, setQuery] = useState("");
@@ -238,8 +257,22 @@ export const FeedPage = () => {
         const response = await api.get<IntelligentSearchResponse>(
           `/posts/search/intelligent?q=${encodeURIComponent(normalizedQuery)}`,
         );
-        setPosts(response.data.posts);
-        setSearchAI(response.data.ai);
+        const aiAnalysis = response.data.ai;
+        let aiPosts = response.data.posts;
+
+        if (!aiPosts.length && aiAnalysis.detectedAnimeTitles.length) {
+          const fallbackQueries = buildFallbackQueriesFromAI(aiAnalysis);
+          for (const fallbackQuery of fallbackQueries) {
+            const fallbackPosts = await runSimpleSearch(fallbackQuery);
+            if (fallbackPosts.length) {
+              aiPosts = fallbackPosts;
+              break;
+            }
+          }
+        }
+
+        setPosts(aiPosts);
+        setSearchAI(aiAnalysis);
       } else {
         const simpleResults = await runSimpleSearch(normalizedQuery);
         setPosts(simpleResults);

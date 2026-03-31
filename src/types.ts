@@ -70,7 +70,7 @@ export interface RecommendationChatResponse {
 }
 
 export interface IntelligentSearchAI {
-  source: "gemini" | "fallback";
+  source: "gemini" | "groq" | "fallback";
   intent: "recommendation" | "comparison" | "analysis" | "general-search";
   sentimentHint: "positive" | "negative" | "mixed" | "neutral";
   detectedAnimeTitles: string[];
